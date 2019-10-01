@@ -157,7 +157,7 @@ def removeAttack(num, list):
     return list
 
 
-def smallestStringWithSwaps(self, s: str, pairs: List[List[int]]) -> str:
+
 
 
 
