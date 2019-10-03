@@ -14,16 +14,17 @@ class BaseDetector:
     Single measure or multiple measure
     """
 
-    def __init__(self, timestamp_col_name=None, measure_col_names=[], symbolic=False):
+    def __init__(self, timestamp_col_name=None, measure_col_names=None, symbolic=False):
         """
         Detector independent initialization, initialize resource that is
         common for all detectors
 
         Data format definition
-        Define the format that this
+        timestamp_col_name: the column name for timestamp
+        measure_col_names: the list of column name that need to be considered by detector
         """
         assert timestamp_col_name is None or isinstance(timestamp_col_name, str)
-        assert isinstance(measure_col_names, list) and len(measure_col_names) > 0
+        assert timestamp_col_name is None or (isinstance(measure_col_names, list) and len(measure_col_names) > 0)
         assert isinstance(symbolic, bool)
         self.timestamp = timestamp_col_name
         self.measure = measure_col_names
@@ -46,25 +47,51 @@ class BaseDetector:
         result = []
         symbolic_split = ","
         if isinstance(data, dict):
-            if self.timestamp in data:
+            if self.measure is None:
+                return None
+            if self.timestamp is not None:
+                if self.timestamp in data:
+                    try:
+                        result.append(float(data[self.timestamp]))
+                        [result.append(data[measure]) for measure in self.measure]
+                    except RuntimeError:
+                        return None
+                else:
+                    return None
+            else:
                 try:
-                    result.append(float(data[self.timestamp]))
                     [result.append(data[measure]) for measure in self.measure]
                 except RuntimeError:
                     return None
-            else:
-                return None
         elif isinstance(data, list):
-            if len(data) == len(self.measure) + 1:
-                try:
-                    result = data
-                    result[0] = float(result[0])
-                except RuntimeError as e:
+            if self.timestamp is not None:
+                if len(data) == len(self.measure) + 1:
+                    try:
+                        result = data
+                        result[0] = float(result[0])
+                    except RuntimeError as e:
+                        return None
+                else:
                     return None
             else:
-                return None
+                if len(data) == len(self.measure):
+                    try:
+                        result = data
+                    except RuntimeError as e:
+                        return None
+                else:
+                    return None
         else:
-            return None
+            if (self.measure is None or len(self.measure) == 1) and self.timestamp is None:
+                if self.symbolic:
+                    return str(data)
+                else:
+                    try:
+                        return float(data)
+                    except RuntimeError as e:
+                        return None
+            else:
+                return None
 
         if not self.symbolic:
             return [float(result[i]) for i in range(len(result))]
@@ -72,7 +99,7 @@ class BaseDetector:
             if self.timestamp is not None:
                 return [result[0], symbolic_split.join([str(s) for s in result[1:]])]
             else:
-                return [symbolic_split.join([str(s) for s in result[1:]])]
+                return symbolic_split.join([str(s) for s in result])
 
     def get_data_format(self):
         """
@@ -104,3 +131,12 @@ class BaseDetector:
         instead of a block data.
         """
         raise NotImplementedError
+
+    def handle_record_sequence(self, record_sequence):
+        """
+        This function provide an ability to handle a list of data record sequentially
+        """
+        result = []
+        for record in record_sequence:
+            result.append(self.handle_record(record))
+        return result
