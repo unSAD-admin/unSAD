@@ -24,7 +24,7 @@ class BaseDetector:
         measure_col_names: the list of column name that need to be considered by detector
         """
         assert timestamp_col_name is None or isinstance(timestamp_col_name, str)
-        assert timestamp_col_name is None or (isinstance(measure_col_names, list) and len(measure_col_names) > 0)
+        assert measure_col_names is None or (isinstance(measure_col_names, list) and len(measure_col_names) > 0)
         assert isinstance(symbolic, bool)
         self.timestamp = timestamp_col_name
         self.measure = measure_col_names
