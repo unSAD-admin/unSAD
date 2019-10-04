@@ -12,10 +12,10 @@ RUN apt-get install --assume-yes python-pip
 
 RUN echo "Installing python2 libraries"
 
-RUN pip2 install nupic
+RUN pip2 install nupic Flask
 
 
 COPY /htmHome/* /home/htmHome/
 
-RUN python /home/htmHome/htm_detector.py
+RUN python /home/htmHome/detector_service_provider.py
 

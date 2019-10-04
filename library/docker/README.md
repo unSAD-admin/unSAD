@@ -1,0 +1,1 @@
+Some detector may be implemented with docker. This directory is used to store all the related docker file
