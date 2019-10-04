@@ -60,7 +60,7 @@ if __name__ == '__main__':
     print(sequence)
 
     detector = SequentialPatternAnomalyDetector()
-    window_size = 100
+    window_size = 60
     detector.initialize(window_size)
 
     result = detector.handle_record_sequence(sequence)
