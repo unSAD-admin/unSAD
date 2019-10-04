@@ -2,7 +2,7 @@
 
 
 def normalize(collection):
-    if (isinstance(collection, dict)):
+    if isinstance(collection, dict):
         total = 0
         result = {}
         for key in collection:
