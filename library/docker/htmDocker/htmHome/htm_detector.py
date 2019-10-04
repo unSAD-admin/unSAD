@@ -21,6 +21,9 @@
 # ----------------------------------------------------------------------
 
 import math
+import time
+import random
+from datetime import datetime
 
 from nupic.algorithms import anomaly_likelihood
 from nupic.frameworks.opf.common_models.cluster_params import (
@@ -33,26 +36,16 @@ except:
     from nupic.frameworks.opf.modelfactory import ModelFactory
 
 
-def getProbationPeriod(probationPercent, fileLength):
-    """Return the probationary period index."""
-    return min(
-        math.floor(probationPercent * fileLength),
-        probationPercent * 5000)
-
-
 class HtmDetector():
     """
     This detector uses an HTM based anomaly detection technique.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.model = None
         self.sensorParams = None
         self.anomalyLikelihood = None
         # Keep track of value range for spatial anomaly detection
-
-        # getProbationPeriod(
-        #   0.15, 4032)
 
         self.minVal = None
 
@@ -64,7 +57,7 @@ class HtmDetector():
         # to re-optimize the thresholds when running with this setting.
         self.useLikelihood = True
 
-    def handleRecord(self, inputData):
+    def handle_record(self, inputData):
         """Returns a tuple (anomalyScore, rawScore).
 
     Internally to NuPIC "anomalyScore" corresponds to "likelihood_score"
@@ -169,8 +162,42 @@ class HtmDetector():
         self.sensorParams = encoderParams["value"]
 
 
-import time
-from datetime import datetime
+class DetectorServiceProvider:
+
+    def __init__(self, max_size=10):
+
+        self.max_size = max_size
+        self.all_detectors = []
+        self.detectors = {}
+
+    def create_htm_detector(self, lower_data_limit=-1e9, upper_data_limit=1e9, probation_number=750,
+                            spatial_tolerance=0.05):
+        htm_detector = HtmDetector()
+        htm_detector.initialize(lower_data_limit, upper_data_limit, probation_number, spatial_tolerance)
+        key = str(time.time()) + str(random.randint(0, 1000))
+
+        self.all_detectors.append(key)
+        self.detectors[key] = htm_detector
+        # FIFO protocol to recycle the detectors
+        while len(self.all_detectors) > self.max_size:
+            key_to_delete = self.detectors.pop(0)
+            del self.detectors[key_to_delete]
+        return key
+
+    def recycle_all_detectors(self):
+        self.all_detectors = []
+        self.detectors = {}
+
+    def set_max_detector(self, max_num):
+        self.max_size = max_num
+
+    def handle_record(self, input_data, detector_key):
+        if detector_key in self.detectors:
+            return self.detectors[detector_key].handle_record(input_data)
+        else:
+            # the detector is no longer exsit
+            return None
+
 
 if __name__ == '__main__':
     detector = HtmDetector()
