@@ -31,8 +31,10 @@ class ADCNN(nn.Module):
 
 # reference: https://github.com/jessicayung/blog-code-snippets/blob/master/lstm-pytorch/lstm-baseline.py
 class ADLSTM(nn.Module):
-    def __init__(self, output_size = 1):
+    def __init__(self, output_size = 1, seq2seq=True):
         super().__init__()
+        # sequence 2 sequence
+        self.seq2seq = seq2seq
         self.hidden_dim = 32
         self.num_layers = 2
         # input dimension is 1
@@ -53,10 +55,12 @@ class ADLSTM(nn.Module):
         ula, (h_out, _) = self.lstm(x, (h_0, c_0))
         # TODO: why it's using hidden feature here:
         # https://github.com/spdin/time-series-prediction-lstm-pytorch/blob/master/Time_Series_Prediction_with_LSTM_Using_PyTorch.ipynb
-        # import pdb;pdb.set_trace()
-        # h_out = h_out[-1].view(-1, self.hidden_dim)
         # seq2seq model
-        out = self.fc(ula)
+        if self.seq2seq:
+            out = self.fc(ula)
+        else:
+            h_out = h_out[-1].view(-1, self.hidden_dim)
+            out = self.fc(h_out)
         return out
 
 
@@ -78,7 +82,17 @@ class TestLSTMDims(unittest.TestCase):
         batch_size = 11
         for window_size in [25, 35, 45]:
             for output_size in [1, 10, 100]:
-                adlstm = ADLSTM(output_size)
+                adlstm = ADLSTM(output_size, seq2seq = False)
+                # 3d input
+                x = np.ones([batch_size, window_size, 1], dtype=np.float32)
+                x = torch.FloatTensor(torch.from_numpy(x))
+                y =  adlstm(x)
+                self.assertEqual(y.shape, torch.Size([batch_size, output_size]))
+    def test_dims_seq2seq(self):
+        batch_size = 11
+        for window_size in [25, 35, 45]:
+            for output_size in [1, 10, 100]:
+                adlstm = ADLSTM(output_size, seq2seq = True)
                 # 3d input
                 x = np.ones([batch_size, window_size, 1], dtype=np.float32)
                 x = torch.FloatTensor(torch.from_numpy(x))
