@@ -3,7 +3,7 @@ from flask import Flask
 from flask import jsonify
 from datetime import datetime
 
-from .htm_detector import DetectorServiceProvider
+from htm_detector import DetectorServiceProvider
 
 app = Flask(__name__)
 
