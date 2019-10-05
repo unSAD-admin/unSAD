@@ -17,5 +17,7 @@ RUN pip2 install nupic Flask
 
 COPY /htmHome/* /home/htmHome/
 
-RUN python /home/htmHome/detector_service_provider.py
+EXPOSE 80:8080
+
+RUN nohup python /home/htmHome/detector_service_provider.py
 
