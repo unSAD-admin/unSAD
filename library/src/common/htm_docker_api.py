@@ -9,7 +9,7 @@ from utils.docker_manager import init_docker_environment
 from utils.docker_manager_cmd import get_target_ip_address
 
 
-class HTMApiProvider():
+class HTMApiProvider:
 
     def __init__(self, docker_path, port=8081, tag="htm/htm:1.0"):
         """
@@ -108,6 +108,10 @@ class HTMApiProvider():
             return False
 
 
+"""
+The following code are example about how to use this htm docker api to train
+"""
+
 import time
 
 if __name__ == '__main__':
@@ -126,7 +130,7 @@ if __name__ == '__main__':
 
     ts = []
     vs = []
-    for i in range(4, 4000):
+    for i in range(4, 400):
         ts.append(i + 1)
         vs.append(0.12 + i * 2)
     now = time.time()
