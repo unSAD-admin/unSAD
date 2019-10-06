@@ -3,7 +3,7 @@ from flask import Flask
 from flask import jsonify
 from datetime import datetime
 
-from .htm_detector import DetectorServiceProvider
+from htm_detector import DetectorServiceProvider
 
 app = Flask(__name__)
 
@@ -45,4 +45,4 @@ def handle_record(key, timestamp, value):
 
 
 if __name__ == '__main__':
-    app.run(port=80)
+    app.run(port=8081, host="0.0.0.0")
