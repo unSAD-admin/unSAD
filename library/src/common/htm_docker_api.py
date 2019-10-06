@@ -2,7 +2,6 @@
 
 from http_api_client import HttpApiClient
 import sys
-import json
 
 sys.path.append("../")
 from utils.docker_manager import init_docker_environment
@@ -69,9 +68,13 @@ class HTMApiProvider():
         these two values.
         """
         result = self.api_client.call("handle", [key, timestamp, value])
-        print(result)
-        return result
-        #return json.loads(result)
+        if result is not None:
+            result = result.split(",")
+            return {
+                "anomalyScore": float(result[0]),
+                "rawScore": float(result[1])
+            }
+        return None
 
     def recycle_detector(self):
         result = self.api_client.call("recycle", [])
