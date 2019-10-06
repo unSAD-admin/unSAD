@@ -2,6 +2,7 @@
 
 from http_api_client import HttpApiClient
 import sys
+import json
 
 sys.path.append("../")
 from utils.docker_manager import init_docker_environment
@@ -67,8 +68,8 @@ class HTMApiProvider():
         Since the HTM detector takes in two parameter: timestamp and value, you need to provide
         these two values.
         """
-        result = self.api_client.call("handle", [key, timestamp, value], result_format="json")
-        return result
+        result = self.api_client.call("handle", [key, timestamp, value])
+        return json.loads(result)
 
     def recycle_detector(self):
         result = self.api_client.call("recycle", [])

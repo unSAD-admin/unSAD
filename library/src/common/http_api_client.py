@@ -7,7 +7,7 @@ class HttpApiClient:
         self.ip = ip_address
         self.port = str(port)
 
-    def call(self, path, params=[], result_format="str"):
+    def call(self, path, params=[]):
         assert isinstance(params, list)
         url = "http://" + self.ip + ":" + self.port + "/" + path
         if len(params) != 0:
@@ -15,8 +15,4 @@ class HttpApiClient:
                 url += "/" + str(params)
 
         r = requests.get(url)
-
-        if result_format == "json":
-            return r.json()
-        else:
-            return r.text
+        return r.text
