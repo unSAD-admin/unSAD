@@ -10,7 +10,7 @@ app = Flask(__name__)
 detectorServiceProvider = DetectorServiceProvider(10)
 
 
-@app.route('/new_detector/<lower_limit>/<upper_limit>/<probation_number>/<spatial_tolerace>')
+@app.route('/new_detector/<lower_data_limit>/<upper_data_limit>/<probation_number>/<spatial_tolerance>')
 def new_detector(lower_data_limit=-1e9, upper_data_limit=1e9, probation_number=750,
                  spatial_tolerance=0.05):
     return detectorServiceProvider.create_htm_detector(float(lower_data_limit), float(upper_data_limit),

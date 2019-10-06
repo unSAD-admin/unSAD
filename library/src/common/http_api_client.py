@@ -13,6 +13,6 @@ class HttpApiClient:
         if len(params) != 0:
             for param in params:
                 url += "/" + str(params)
-
+        print(url)
         r = requests.get(url)
         return r.text
