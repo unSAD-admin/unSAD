@@ -88,7 +88,7 @@ if __name__ == '__main__':
     detector_key = htm.create_new_detector()
     print(detector_key)
     result = []
-    for i in range(100):
+    for i in range(4):
         result.append(htm.pass_record_to_detector(detector_key, i + 1, 0.12 + i * 2))
 
     print(result)

@@ -2,6 +2,7 @@
 from flask import Flask
 from flask import jsonify
 from datetime import datetime
+import json
 
 from htm_detector import DetectorServiceProvider
 
@@ -41,7 +42,10 @@ def handle_record(key, timestamp, value):
     if result is None:
         return ""
 
-    return jsonify(anomalyScore=result[0], rawScore=result[1])
+    return json.dumps({
+        "anomalyScore": result[0],
+        "rawScore": result[1]
+    })
 
 
 if __name__ == '__main__':
