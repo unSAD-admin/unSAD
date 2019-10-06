@@ -3,7 +3,7 @@
 import subprocess
 import time
 
-from library.src.utils.annotations import simple_thread
+from utils.annotations import simple_thread
 
 target_ip_address = None
 preferred_ip_address = "127.0.0.2"
