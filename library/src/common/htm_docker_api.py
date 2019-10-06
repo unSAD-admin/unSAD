@@ -1,6 +1,6 @@
 # Created by Xinyu Zhu on 10/6/2019, 1:42 AM
 
-from common.http_api_client import HttpApiClient
+from http_api_client import HttpApiClient
 from utils.docker_manager import init_docker_environment
 from utils.docker_manager_cmd import get_target_ip_address
 
