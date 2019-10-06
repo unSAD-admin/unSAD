@@ -115,5 +115,13 @@ if __name__ == '__main__':
     print(result)
     print(t)
 
-    result = htm.pass_block_record_to_detector(detector_key, [7, 8, 9, 10], [0.2, 0.4, 0.5, 0.6])
+    ts = []
+    vs = []
+    for i in range(4, 40000):
+        ts.append(i + 1)
+        vs.append(0.12 + i * 2)
+    now = time.time()
+    result = htm.pass_block_record_to_detector(detector_key, ts, vs)
+    t = time.time() - now
     print(result)
+    print(t)
