@@ -10,10 +10,10 @@ from common.http_api_client import HttpApiClient
 from utils.docker_manager_cmd import get_target_ip_address
 
 try:
-    ip = init_docker_environment("../../../docker/htmDocker/")
+    ip = init_docker_environment("../../../docker/htmDocker/", tag="htm/htm:1.0")
     print("Got ip address:", ip, "from python docker API")
 except RuntimeError:
-    ip = get_target_ip_address("../../../docker/htmDocker/")
+    ip = get_target_ip_address("../../../docker/htmDocker/", tag="htm/htm:1.0")
     print("Got ip address:", ip, "from command line")
 
 print(ip)

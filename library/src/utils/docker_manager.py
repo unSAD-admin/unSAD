@@ -1,15 +1,42 @@
 # Created by Xinyu Zhu on 10/4/2019, 10:35 PM
 
 import docker
+import time
+
+from annotations import simple_thread
 
 
-def init_docker_environment():
+@simple_thread
+def build_image(client, path, tag):
     client = docker.from_env()
+    client.images.build(path=path, tag=tag)
 
-    result = client.images.list()
-    print(result)
-    ##client.images.build(path="../../docker/htmDocker")
+
+def get_ip_address(client, container_id):
+    return docker.APIClient().inspect_container(container_id)['NetworkSettings']['Networks']['bridge']['IPAddress']
+
+
+def query_container_id(client):
+    container_list = client.containers.list()
+    result = []
+    for container in container_list:
+        result.append(container.id)
+    return result
+
+
+def init_docker_environment(path, tag="htm/htm:1.0", timeout=600):
+    build_image()
+
+    client = docker.from_env()
+    while len(query_container_id()) == 0:
+        time.sleep(1)
+        timeout -= 1
+        if timeout < 0:
+            raise RuntimeError("Docker launch failed!")
+
+    ip_address = get_ip_address(client, query_container_id()[0])
+    return ip_address
 
 
 if __name__ == '__main__':
-    init_docker_environment()
+    print(init_docker_environment(path="../../docker/htmDocker"))

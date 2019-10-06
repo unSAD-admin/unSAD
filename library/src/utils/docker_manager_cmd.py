@@ -8,6 +8,7 @@ from utils.annotations import simple_thread
 target_ip_address = None
 preferred_ip_address = "127.0.0.2"
 
+
 def run_cmd(command):
     popen = subprocess.Popen(command.split(), stdout=subprocess.PIPE, universal_newlines=True)
 
@@ -20,9 +21,9 @@ def run_cmd(command):
 
 
 @simple_thread
-def build_image(docker_directory="../../docker/htmDocker/"):
+def build_image(docker_directory="../../docker/htmDocker/", tag="htm/htm:1.0"):
     print("building image start")
-    for line in run_cmd("docker build -t htm/htm:1.0 " + docker_directory):
+    for line in run_cmd("docker build -t " + tag + " " + docker_directory):
         print(line)
         # yield line
         if "http://0.0.0.0" in line:
@@ -38,10 +39,10 @@ def query_ip_address():
     print(target_ip_address)
 
 
-def get_target_ip_address(docker_directory="../../docker/htmDocker/", max_time_out=600):
+def get_target_ip_address(docker_directory="../../docker/htmDocker/", tag="htm/htm:1.0", max_time_out=600):
     global target_ip_address
     target_ip_address = None
-    build_image(docker_directory)
+    build_image(docker_directory, tag)
     print("waiting")
 
     while target_ip_address is None:

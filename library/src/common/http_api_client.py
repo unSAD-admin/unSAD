@@ -13,10 +13,8 @@ class HttpApiClient:
         if len(params) != 0:
             for param in params:
                 url += "/" + str(params)
-        print(url)
-        r = requests.get(url)
 
-        print(r)
+        r = requests.get(url)
 
         if result_format == "json":
             return r.json()
