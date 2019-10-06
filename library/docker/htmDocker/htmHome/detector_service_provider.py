@@ -55,7 +55,7 @@ def handle_block(key):
             "timestamp": datetime.fromtimestamp(float(timestamps[i])),
             "value": float(values[i])
         }
-        result.append(detectorServiceProvider.handle_record(record, key))
+        result.append(str(detectorServiceProvider.handle_record(record, key))[1:-1])
     result_obj = {
         "result": result
     }
