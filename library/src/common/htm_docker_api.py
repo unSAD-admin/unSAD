@@ -69,7 +69,9 @@ class HTMApiProvider():
         these two values.
         """
         result = self.api_client.call("handle", [key, timestamp, value])
-        return json.loads(result)
+        print(result)
+        return result
+        #return json.loads(result)
 
     def recycle_detector(self):
         result = self.api_client.call("recycle", [])
@@ -81,8 +83,10 @@ class HTMApiProvider():
 
 if __name__ == '__main__':
     htm = HTMApiProvider(docker_path="../../docker/htmDocker/")
-
+    print(htm.recycle_detector())
+    print(htm.set_max_detector_num(10))
     detector_key = htm.create_new_detector()
+    print(detector_key)
     result = []
     for i in range(100):
         result.append(htm.pass_record_to_detector(detector_key, i + 1, 0.12 + i * 2))
