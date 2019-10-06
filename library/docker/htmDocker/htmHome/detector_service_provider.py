@@ -1,5 +1,6 @@
 # Created by Xinyu Zhu on 10/4/2019, 3:09 AM
 from flask import Flask
+from flask import request
 from datetime import datetime
 
 from htm_detector import DetectorServiceProvider
@@ -40,6 +41,12 @@ def handle_record(key, timestamp, value):
     if result is None:
         return ""
     return str(result)[1:-1]
+
+
+@app.route("/handle_block/<key>")
+def handle_block(key):
+    value = request.args.get('data')
+    return str(value)
 
 
 if __name__ == '__main__':

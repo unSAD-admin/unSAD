@@ -76,6 +76,19 @@ class HTMApiProvider():
             }
         return None
 
+    def pass_block_record_to_detector(self, key, timestamps, values):
+        """
+        In order to reduce the number of http request to make it more efficient
+        This method is provided to pass a block of data to the server at one run
+        the timestamps and values are two array of data.
+        """
+        data = {
+            "timestamps": timestamps,
+            "values": values
+        }
+        result = self.api_client.call_with_data("handle_block", [key], data, method="post")
+        return result
+
     def recycle_detector(self):
         result = self.api_client.call("recycle", [])
         if result == "success":
@@ -83,7 +96,9 @@ class HTMApiProvider():
         else:
             return False
 
+
 import time
+
 if __name__ == '__main__':
     htm = HTMApiProvider(docker_path="../../docker/htmDocker/")
     print(htm.recycle_detector())
@@ -92,8 +107,11 @@ if __name__ == '__main__':
     print(detector_key)
     result = []
     now = time.time()
-    for i in range(40000):
+    for i in range(4):
         result.append(htm.pass_record_to_detector(detector_key, i + 1, 0.12 + i * 2))
     t = time.time() - now
     print(result)
     print(t)
+
+    result = htm.pass_block_record_to_detector(detector_key, [7, 8, 9, 10], [0.2, 0.4, 0.5, 0.6])
+    print(result)
