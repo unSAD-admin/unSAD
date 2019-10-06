@@ -25,7 +25,7 @@ def build_image(docker_directory="../../docker/htmDocker/"):
     for line in run_cmd("docker build -t htm/htm:1.0 " + docker_directory):
         print(line)
         # yield line
-        if "http://0.0.0.0:8080/" in line:
+        if "http://0.0.0.0" in line:
             query_ip_address()
 
 
