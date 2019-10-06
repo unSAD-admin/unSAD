@@ -86,7 +86,7 @@ class HTMApiProvider():
             "timestamps": timestamps,
             "values": values
         }
-        result = self.api_client.call_with_data("handle_block", [key], data, method="post")
+        result = self.api_client.call_with_data("handle_block", [key], data, method="get")
         return result
 
     def recycle_detector(self):
