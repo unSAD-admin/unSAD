@@ -12,6 +12,8 @@ class HTMApiProvider():
 
     def __init__(self, docker_path, port=8081, tag="htm/htm:1.0"):
         """
+        There should be only one Api Provider running on one port, please maintain a single instance
+        For this class
         :param port: Should be the port exposed by the docker server
         :param docker_path: Should be the path to the fold which contains the Dockerfile
         :param tag: the tag you would like to assign to the docker image

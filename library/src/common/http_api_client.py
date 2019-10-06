@@ -25,6 +25,6 @@ class HttpApiClient:
             for param in params:
                 url += "/" + str(param)
 
-        r = requests.post(url, data=json.dumps(data))
+        r = requests.post(url, data=data)
 
         return r.text
