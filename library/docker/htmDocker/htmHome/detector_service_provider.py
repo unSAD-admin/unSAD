@@ -45,10 +45,17 @@ def handle_record(key, timestamp, value):
 
 @app.route("/handle_block/<key>", methods=['POST'])
 def handle_block(key):
-    value = request.data
-    form = request.form
-    arg = request.args
-    return str(value) + ":" + str(form) + ":" + str(arg)
+    timestamps = request.data.get("timestamps")
+    values = request.data.get("values")
+    result = []
+    for i in range(len(timestamps)):
+        record = {
+            "timestamp": datetime.fromtimestamp(float(timestamps[i])),
+            "value": float(values[i])
+        }
+        result.append(detectorServiceProvider.handle_record(record, key))
+
+    return str(result)
 
 
 if __name__ == '__main__':
