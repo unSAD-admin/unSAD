@@ -10,7 +10,7 @@ from utils.docker_manager_cmd import get_target_ip_address
 
 class HTMApiProvider():
 
-    def __init__(self, port=8081, docker_path="../../docker/htmDocker/", tag="htm/htm:1.0"):
+    def __init__(self, docker_path, port=8081, , tag="htm/htm:1.0"):
         """
         :param port: Should be the port exposed by the docker server
         :param docker_path: Should be the path to the fold which contains the Dockerfile
@@ -79,7 +79,7 @@ class HTMApiProvider():
 
 
 if __name__ == '__main__':
-    htm = HTMApiProvider()
+    htm = HTMApiProvider(docker_path="../../docker/htmDocker/")
 
     detector_key = htm.create_new_detector()
     result = []
