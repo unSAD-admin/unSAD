@@ -47,15 +47,16 @@ def handle_record(key, timestamp, value):
 def handle_block(key):
     timestamps = request.data.get("timestamps")
     values = request.data.get("values")
-    result = []
-    for i in range(len(timestamps)):
-        record = {
-            "timestamp": datetime.fromtimestamp(float(timestamps[i])),
-            "value": float(values[i])
-        }
-        result.append(detectorServiceProvider.handle_record(record, key))
-
-    return str(result)
+    return str(timestamps) + str(values)
+    # result = []
+    # for i in range(len(timestamps)):
+    #     record = {
+    #         "timestamp": datetime.fromtimestamp(float(timestamps[i])),
+    #         "value": float(values[i])
+    #     }
+    #     result.append(detectorServiceProvider.handle_record(record, key))
+    #
+    # return str(result)
 
 
 if __name__ == '__main__':
