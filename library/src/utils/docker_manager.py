@@ -3,7 +3,7 @@
 import docker
 import time
 
-from annotations import simple_thread
+from utils.annotations import simple_thread
 
 
 @simple_thread

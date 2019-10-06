@@ -6,7 +6,6 @@ import time
 from utils.annotations import simple_thread
 
 target_ip_address = None
-preferred_ip_address = "127.0.0.2"
 
 
 def run_cmd(command):
