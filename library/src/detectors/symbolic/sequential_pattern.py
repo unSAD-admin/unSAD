@@ -1,8 +1,12 @@
 # Created by Xinyu Zhu on 10/3/2019, 1:33 AM
-from library.src.detectors.base import BaseDetector
+
+import sys
+sys.path.append("../../")
+
+from detectors.base import BaseDetector
 from collections import defaultdict
 
-from library.src.utils.collection_tools import normalize
+from utils.collection_tools import normalize
 
 
 class SequentialPatternAnomalyDetector(BaseDetector):
