@@ -4,7 +4,7 @@ import sys
 import json
 
 sys.path.append("../")
-from http_api_client import HttpApiClient
+from common.http_api_client import HttpApiClient
 from utils.docker_manager import init_docker_environment
 from utils.docker_manager_cmd import get_target_ip_address
 
