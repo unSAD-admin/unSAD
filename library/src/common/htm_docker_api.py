@@ -101,6 +101,9 @@ class HTMApiProvider:
         return rt
 
     def recycle_detector(self):
+        """
+        delete all the detectors
+        """
         result = self.api_client.call("recycle", [])
         if result == "success":
             return True
