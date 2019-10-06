@@ -2,7 +2,7 @@
 from flask import Flask
 from flask import request
 from datetime import datetime
-
+import json
 from htm_detector import DetectorServiceProvider
 
 app = Flask(__name__)
@@ -45,8 +45,9 @@ def handle_record(key, timestamp, value):
 
 @app.route("/handle_block/<key>", methods=['POST'])
 def handle_block(key):
-    timestamps = request.data.get("timestamps")
-    values = request.data.get("values")
+    obj = json.loads(request.data)
+    timestamps = obj["timestamps"]
+    values = obj["values"]
     return str(timestamps) + str(values)
     # result = []
     # for i in range(len(timestamps)):
