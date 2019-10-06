@@ -27,6 +27,8 @@ detectors: define core logic for anomaly detection
 
 test: define test logic to test functions in other layers
 
+![](UML.png)
+
 
 ## Developer Guide
 
