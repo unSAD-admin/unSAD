@@ -1,9 +1,14 @@
 # Created by Xinyu Zhu on 10/3/2019, 2:47 AM
+
+import sys
+
+sys.path.append("../")
+
 from collections import defaultdict
 
-from library.src.detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
-from library.src.utils.analysis import drawArray
-from library.src.utils.collection_tools import simple_filter, mean_filter
+from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
+from utils.analysis import drawArray
+from utils.collection_tools import simple_filter, mean_filter
 
 
 def readFile(filename):
@@ -66,6 +71,6 @@ if __name__ == '__main__':
     result = detector.handle_record_sequence(sequence)
 
     result = simple_filter(result, mean_filter, window_size)
-    #print(result)
+    # print(result)
     drawArray(result)
-    #detector.handle_record_sequence()
+    # detector.handle_record_sequence()
