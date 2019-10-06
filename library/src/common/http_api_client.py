@@ -12,7 +12,7 @@ class HttpApiClient:
         url = "http://" + self.ip + ":" + self.port + "/" + path
         if len(params) != 0:
             for param in params:
-                url += "/" + str(params)
+                url += "/" + str(param)
         print(url)
         r = requests.get(url)
         return r.text
