@@ -11,7 +11,7 @@ from utils.docker_manager_cmd import get_target_ip_address
 
 class HTMApiProvider:
 
-    def __init__(self, docker_path, port=8081, tag="htm/htm:1.0"):
+    def __init__(self, docker_path, docker_ip=None, port=8081, tag="htm/htm:1.0"):
         """
         There should be only one Api Provider running on one port, please maintain a single instance
         For this class
@@ -19,23 +19,35 @@ class HTMApiProvider:
         :param docker_path: Should be the path to the fold which contains the Dockerfile
         :param tag: the tag you would like to assign to the docker image
         """
-        ip = None
-        try:
-            ip = init_docker_environment(docker_path, tag=tag)
-            print("Got ip address:", ip, "from python docker API")
-        except RuntimeError:
+        if docker_path is not None:
+            ip = None
             try:
-                ip = get_target_ip_address(docker_path, tag=tag)
-                print("Got ip address:", ip, "from command line")
+                ip = init_docker_environment(docker_path, tag=tag)
+                print("Got ip address:", ip, "from python docker API")
             except RuntimeError:
-                pass
-        if ip is None:
-            raise RuntimeError("Docker is not set up correctly on your environment. "
-                               "Please make sure docker command is accessible")
+                try:
+                    ip = get_target_ip_address(docker_path, tag=tag)
+                    print("Got ip address:", ip, "from command line")
+                except RuntimeError:
+                    pass
+            if ip is None:
+                raise RuntimeError("Docker is not set up correctly on your environment. "
+                                   "Please make sure docker command is accessible")
 
-        self.ip = ip
-        self.port = port
-        self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
+            self.ip = ip
+            self.port = port
+            self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
+        else:
+            if docker_ip is None:
+                print("User didn't provide a docker path, assume the ip address is provided")
+                self.ip = docker_ip
+                self.port = port
+                self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
+            else:
+                raise RuntimeError(
+                    "Please either provide an docker path for the program to initialize the docker "
+                    "environment or set up an accessible docker environment and provide"
+                    " an ip address(for example: 127.0.0.1) to the APIs")
 
     def set_max_detector_num(self, num=10):
         """
@@ -124,8 +136,7 @@ if __name__ == '__main__':
     print(htm.set_max_detector_num(10))
 
     # create new detector with default parameters
-    detector_key = htm.create_new_detector() # keep the detector_key
-
+    detector_key = htm.create_new_detector()  # keep the detector_key
 
     print(detector_key)
     result = []
