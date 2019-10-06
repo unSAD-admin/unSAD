@@ -25,6 +25,7 @@ class HttpApiClient:
             for param in params:
                 url += "/" + str(param)
 
-        r = requests.post(url, data=data, json=data, headers = {'Content-Type': 'application/json', 'Accept':'application/json'})
+        r = requests.post(url, data=json.dumps(data),
+                          headers={'Content-Type': 'application/json', 'Accept': 'application/json'})
 
         return r.text
