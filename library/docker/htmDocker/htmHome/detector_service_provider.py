@@ -48,16 +48,18 @@ def handle_block(key):
     obj = json.loads(request.data)
     timestamps = obj["timestamps"]
     values = obj["values"]
-    return str(timestamps) + str(values)
-    # result = []
-    # for i in range(len(timestamps)):
-    #     record = {
-    #         "timestamp": datetime.fromtimestamp(float(timestamps[i])),
-    #         "value": float(values[i])
-    #     }
-    #     result.append(detectorServiceProvider.handle_record(record, key))
-    #
-    # return str(result)
+
+    result = []
+    for i in range(len(timestamps)):
+        record = {
+            "timestamp": datetime.fromtimestamp(float(timestamps[i])),
+            "value": float(values[i])
+        }
+        result.append(detectorServiceProvider.handle_record(record, key))
+    result_obj = {
+        "result": result
+    }
+    return json.dumps(result_obj)
 
 
 if __name__ == '__main__':
