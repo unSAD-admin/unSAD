@@ -2,6 +2,7 @@
 
 from http_api_client import HttpApiClient
 import sys
+import json
 
 sys.path.append("../")
 from utils.docker_manager import init_docker_environment
@@ -117,11 +118,14 @@ if __name__ == '__main__':
 
     ts = []
     vs = []
-    for i in range(4, 400):
+    for i in range(4, 4000):
         ts.append(i + 1)
         vs.append(0.12 + i * 2)
     now = time.time()
     result = htm.pass_block_record_to_detector(detector_key, ts, vs)
     t = time.time() - now
+    result = json.loads(result)["result"]
+    for r in result:
+        print(type(r), r)
     print(result)
     print(t)
