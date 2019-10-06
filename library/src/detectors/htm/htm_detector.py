@@ -91,7 +91,7 @@ class SequentialPatternAnomalyDetector(BaseDetector):
             self.handle_record(record)
 
 if __name__ == '__main__':
-    htm = HTMApiProvider(docker_path="../../docker/htmDocker/")
+    htm = HTMApiProvider(docker_path="../../../docker/htmDocker/")
     # Test basic API
     print(htm.recycle_detector())
     print(htm.set_max_detector_num(10))
