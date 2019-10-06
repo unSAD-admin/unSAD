@@ -21,4 +21,4 @@ class HttpApiClient:
         if result_format == "json":
             return r.json()
         else:
-            return r
+            return r.text
