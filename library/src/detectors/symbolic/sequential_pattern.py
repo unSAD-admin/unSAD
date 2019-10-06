@@ -1,6 +1,7 @@
 # Created by Xinyu Zhu on 10/3/2019, 1:33 AM
 
 import sys
+
 sys.path.append("../../")
 
 from detectors.base import BaseDetector

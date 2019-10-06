@@ -64,7 +64,7 @@ class BaseDetector:
                     [result.append(data[measure]) for measure in self.measure]
                 except RuntimeError:
                     return None
-        elif isinstance(data, Iterable):
+        elif isinstance(data, Iterable) and not isinstance(data, str):
             if self.timestamp is not None:
                 if len(data) == len(self.measure) + 1:
                     try:

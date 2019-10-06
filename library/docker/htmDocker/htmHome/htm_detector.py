@@ -36,7 +36,7 @@ except:
     from nupic.frameworks.opf.modelfactory import ModelFactory
 
 
-class HtmDetector():
+class HtmDetector:
     """
     This detector uses an HTM based anomaly detection technique.
     """
