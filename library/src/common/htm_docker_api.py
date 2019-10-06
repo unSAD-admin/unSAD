@@ -83,7 +83,7 @@ class HTMApiProvider():
         else:
             return False
 
-
+import time
 if __name__ == '__main__':
     htm = HTMApiProvider(docker_path="../../docker/htmDocker/")
     print(htm.recycle_detector())
@@ -91,7 +91,9 @@ if __name__ == '__main__':
     detector_key = htm.create_new_detector()
     print(detector_key)
     result = []
-    for i in range(4):
+    now = time.time()
+    for i in range(40000):
         result.append(htm.pass_record_to_detector(detector_key, i + 1, 0.12 + i * 2))
-
+    t = time.time() - now
     print(result)
+    print(t)
