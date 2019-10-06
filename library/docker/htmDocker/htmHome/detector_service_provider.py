@@ -59,7 +59,7 @@ def handle_block(key):
     result_obj = {
         "result": result
     }
-    return json.dumps(result_obj)
+    return str(result_obj)
 
 
 if __name__ == '__main__':
