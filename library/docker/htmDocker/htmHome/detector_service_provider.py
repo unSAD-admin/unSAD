@@ -43,7 +43,7 @@ def handle_record(key, timestamp, value):
     return str(result)[1:-1]
 
 
-@app.route("/handle_block/<key>")
+@app.route("/handle_block/<key>", methods=['POST'])
 def handle_block(key):
     value = request.args.get('data')
     return str(value)
