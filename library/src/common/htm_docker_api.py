@@ -98,7 +98,7 @@ class HTMApiProvider():
                 "anomalyScore": float(record[0]),
                 "rawScore": float(record[1])
             })
-        return result
+        return rt
 
     def recycle_detector(self):
         result = self.api_client.call("recycle", [])
