@@ -211,7 +211,7 @@ if __name__ == '__main__':
                 timestamp = time.mktime(time.strptime(r[0], '%Y-%m-%d  %H:%M:%S'))
                 value = float(r[1])
 
-                result.append(detector.handleRecord({"timestamp": datetime.fromtimestamp(timestamp), "value": value}))
+                result.append(detector.handle_record({"timestamp": datetime.fromtimestamp(timestamp), "value": value}))
     with open("output.txt", "w") as f:
         for r in result:
             f.write(str(r) + "\n")

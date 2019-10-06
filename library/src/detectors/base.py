@@ -1,4 +1,5 @@
 # Created by Xinyu Zhu on 10/2/2019, 11:46 PM
+from collections import Iterable
 
 
 class BaseDetector:
@@ -63,7 +64,7 @@ class BaseDetector:
                     [result.append(data[measure]) for measure in self.measure]
                 except RuntimeError:
                     return None
-        elif isinstance(data, list):
+        elif isinstance(data, Iterable):
             if self.timestamp is not None:
                 if len(data) == len(self.measure) + 1:
                     try:
