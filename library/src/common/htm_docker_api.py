@@ -89,7 +89,15 @@ class HTMApiProvider():
             "timestamps": timestamps,
             "values": values
         }
+        rt = []
         result = self.api_client.call_with_data("handle_block", [key], data)
+        result = json.loads(result)["result"]
+        for record in result:
+            record = record.split(",")
+            rt.append({
+                "anomalyScore": float(record[0]),
+                "rawScore": float(record[1])
+            })
         return result
 
     def recycle_detector(self):
@@ -124,8 +132,8 @@ if __name__ == '__main__':
     now = time.time()
     result = htm.pass_block_record_to_detector(detector_key, ts, vs)
     t = time.time() - now
-    result = json.loads(result)["result"]
+
     for r in result:
-        print(type(r), r)
+        print(r)
     print(result)
     print(t)
