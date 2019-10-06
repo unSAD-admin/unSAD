@@ -41,11 +41,11 @@ def handle_record(key, timestamp, value):
 
     if result is None:
         return ""
-
-    return json.dumps({
-        "anomalyScore": result[0],
-        "rawScore": result[1]
-    })
+    return str(result)
+    # return json.dumps({
+    #     "anomalyScore": result[0],
+    #     "rawScore": result[1]
+    # })
 
 
 if __name__ == '__main__':
