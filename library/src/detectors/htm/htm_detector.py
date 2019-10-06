@@ -37,7 +37,7 @@ class HTMAnomalyDetector(BaseDetector):
 
 
         result = (self.htm.pass_record_to_detector(self.detector_key, record[0], record[1]))  # (key,timestamp,value)
-
+        print(result)
         return result
 
 
