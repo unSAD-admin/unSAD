@@ -59,7 +59,7 @@ def handle_block(key):
     result_obj = {
         "result": result
     }
-    return str(result_obj)
+    return str(result_obj).replace("'", '"')
 
 
 if __name__ == '__main__':

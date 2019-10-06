@@ -88,7 +88,7 @@ class HTMApiProvider():
             "timestamps": timestamps,
             "values": values
         }
-        result = self.api_client.call_with_data("handle_block", [key],  data)
+        result = self.api_client.call_with_data("handle_block", [key], data)
         return result
 
     def recycle_detector(self):
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     ts = []
     vs = []
-    for i in range(4, 40000):
+    for i in range(4, 400):
         ts.append(i + 1)
         vs.append(0.12 + i * 2)
     now = time.time()
