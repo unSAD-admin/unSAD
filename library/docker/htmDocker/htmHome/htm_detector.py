@@ -43,7 +43,7 @@ class HtmDetector:
 
     def __init__(self):
         self.model = None
-        self.sensorParams = None
+        # self.sensorParams = None
         self.anomalyLikelihood = None
         # Keep track of value range for spatial anomaly detection
 
@@ -132,8 +132,8 @@ class HtmDetector:
             tmImplementation="cpp"
         )["modelConfig"]
 
-        self._setupEncoderParams(
-            modelParams["modelParams"]["sensorParams"]["encoders"])
+        # self._setupEncoderParams(
+        #     modelParams["modelParams"]["sensorParams"]["encoders"])
 
         self.model = ModelFactory.create(modelParams)
 
@@ -141,25 +141,25 @@ class HtmDetector:
 
         if self.useLikelihood:
             # Initialize the anomaly likelihood object
-            numentaLearningPeriod = int(math.floor(self.probationaryPeriod / 2.0))
+            numenta_learning_period = int(math.floor(self.probationaryPeriod / 2.0))
             self.anomalyLikelihood = anomaly_likelihood.AnomalyLikelihood(
-                learningPeriod=numentaLearningPeriod,
-                estimationSamples=self.probationaryPeriod - numentaLearningPeriod,
+                learningPeriod=numenta_learning_period,
+                estimationSamples=self.probationaryPeriod - numenta_learning_period,
                 reestimationPeriod=100
             )
 
-    def _setupEncoderParams(self, encoderParams):
-        # The encoder must expect the NAB-specific datafile headers
-        encoderParams["timestamp_dayOfWeek"] = encoderParams.pop("c0_dayOfWeek")
-        encoderParams["timestamp_timeOfDay"] = encoderParams.pop("c0_timeOfDay")
-        encoderParams["timestamp_timeOfDay"]["fieldname"] = "timestamp"
-        encoderParams["timestamp_timeOfDay"]["name"] = "timestamp"
-        encoderParams["timestamp_weekend"] = encoderParams.pop("c0_weekend")
-        encoderParams["value"] = encoderParams.pop("c1")
-        encoderParams["value"]["fieldname"] = "value"
-        encoderParams["value"]["name"] = "value"
-
-        self.sensorParams = encoderParams["value"]
+    # def _setupEncoderParams(self, encoderParams):
+    #     # The encoder must expect the NAB-specific datafile headers
+    #     encoderParams["timestamp_dayOfWeek"] = encoderParams.pop("c0_dayOfWeek")
+    #     encoderParams["timestamp_timeOfDay"] = encoderParams.pop("c0_timeOfDay")
+    #     encoderParams["timestamp_timeOfDay"]["fieldname"] = "timestamp"
+    #     encoderParams["timestamp_timeOfDay"]["name"] = "timestamp"
+    #     encoderParams["timestamp_weekend"] = encoderParams.pop("c0_weekend")
+    #     encoderParams["value"] = encoderParams.pop("c1")
+    #     encoderParams["value"]["fieldname"] = "value"
+    #     encoderParams["value"]["name"] = "value"
+    #
+    #     self.sensorParams = encoderParams["value"]
 
 
 class DetectorServiceProvider:
