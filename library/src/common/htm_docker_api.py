@@ -24,12 +24,13 @@ class HTMApiProvider:
             try:
                 ip = init_docker_environment(docker_path, tag=tag)
                 print("Got ip address:", ip, "from python docker API")
-            except RuntimeError:
-                try:
-                    ip = get_target_ip_address(docker_path, tag=tag)
-                    print("Got ip address:", ip, "from command line")
-                except RuntimeError:
-                    pass
+            except Exception:
+                # try:
+                #     ip = get_target_ip_address(docker_path, tag=tag)
+                #     print("Got ip address:", ip, "from command line")
+                # except RuntimeError:
+                #     pass
+                pass
             if ip is None:
                 raise RuntimeError("Docker is not set up correctly on your environment. "
                                    "Please make sure docker command is accessible")
