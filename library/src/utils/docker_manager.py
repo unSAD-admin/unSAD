@@ -31,9 +31,10 @@ def query_container_id(client):
 
 
 def init_docker_environment(path, tag="htm/htm:1.0", timeout=600):
-    build_image(path, tag)
-
     client = docker.from_env()
+    if len(query_container_id(client)) != 0:
+        return get_ip_address(query_container_id(client)[0])
+    build_image(path, tag)
     while len(query_container_id(client)) == 0:
         time.sleep(1)
         timeout -= 1
