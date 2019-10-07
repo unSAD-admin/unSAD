@@ -180,7 +180,7 @@ class DetectorServiceProvider:
         self.detectors[key] = htm_detector
         # FIFO protocol to recycle the detectors
         while len(self.all_detectors) > self.max_size:
-            key_to_delete = self.detectors.pop(0)
+            key_to_delete = self.all_detectors.pop(0)
             del self.detectors[key_to_delete]
         return key
 

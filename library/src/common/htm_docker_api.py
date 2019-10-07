@@ -17,6 +17,8 @@ docker run -p 127.0.0.1:8081:8081 -it 91bf6cb14f72
 python /home/htmHome/detector_service_provider.py
 
 """
+
+
 class HTMApiProvider:
 
     def __init__(self, docker_path, docker_ip=None, port=8081, tag="htm/htm:1.0"):
@@ -103,9 +105,8 @@ class HTMApiProvider:
         the same time, you need to pass the key to the server to indicate which detector you want
         to use
         """
-        result = self.api_client.call("new_detector",
-                                      [lower_data_limit, upper_data_limit, probation_number, spatial_tolerance])
-        return result
+        return self.api_client.call("new_detector",
+                                    [lower_data_limit, upper_data_limit, probation_number, spatial_tolerance])
 
     def pass_record_to_detector(self, key, timestamp, value):
         """
