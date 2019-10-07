@@ -9,7 +9,13 @@ from utils.annotations import simple_thread
 @simple_thread
 def build_image(path, tag):
     client = docker.from_env()
-    client.images.build(path=path, tag=tag)
+    image = client.images.build(path=path, tag=tag)[0]
+
+    # start the docker server
+    client.containers.run(image, "python /home/htmHome/detector_service_provider.py",
+                          ports={"8081/tcp": ('127.0.0.1', 8081)})
+
+    # the session will maintain
 
 
 def get_ip_address(container_id):

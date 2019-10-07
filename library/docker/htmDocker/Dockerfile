@@ -19,5 +19,5 @@ COPY /htmHome/* /home/htmHome/
 
 EXPOSE 8081:8081
 
-RUN python /home/htmHome/detector_service_provider.py
+#RUN python /home/htmHome/detector_service_provider.py
 
