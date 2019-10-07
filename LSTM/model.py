@@ -56,6 +56,7 @@ class ADLSTM(nn.Module):
         # TODO: why it's using hidden feature here:
         # https://github.com/spdin/time-series-prediction-lstm-pytorch/blob/master/Time_Series_Prediction_with_LSTM_Using_PyTorch.ipynb
         # seq2seq model
+        # TODO: add maxpooling instead of using hidden layer
         if self.seq2seq:
             out = self.fc(ula)
         else:

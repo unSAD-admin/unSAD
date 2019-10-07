@@ -11,6 +11,7 @@ class Trainer:
     def train(self, model, x_train, num_epoches = 200):
         # train the model
         # TODO: add non-seq2seq training
+        print("--------training--------")
         batch_size = 1
         output_size = 1
         learning_rate = 1e-3
@@ -21,13 +22,17 @@ class Trainer:
             optimiser.zero_grad()
             x_pred = model(x_train)
             loss = loss_fn(x_pred, x_train)
+            # TODO: what is the loss for ocnn
             # Backward pass
             loss.backward()
             # Update parameters
             optimiser.step()
+    def train_embedding(self, model, x_train, num_epoches=200):
+        pass
     def pred(self, model, x_data, n_preds=None):
         # TODO: add non-seq2seq training
         # seq2seq
+        print("--------prediction--------")
         with torch.no_grad():
             x_pred = model(x_data)
             return x_pred
