@@ -114,8 +114,7 @@ def writecsv(file,filename):
 if __name__ == '__main__':
     labeled_data, unlabeled_data = load_data_label()
     print ('load labeled data over, try to improve htm')
-    htm = HTMAnomalyDetector("timestamp", "value")
-    htm.initialize(docker_path="../../../docker/htmDocker/")
+    
     print('test train by real data')
 
     threshold = 0.512250003693
@@ -126,7 +125,19 @@ if __name__ == '__main__':
         cnt += 1
         print ('-----',file, cnt,'-----')
         #print ('sample:', unlabeled_data[file][:10])
+        min_value = 1e9
+        max_value = -1e9
+        for sample in unlabeled_data[file][:750]:
+            if sample[1] < min_value:
+                min_value = sample[1]
+            if sample[1] > max_value:
+                max_value = sample[1]
         
+        print ('min_value:', min_value, 'max_value:', max_value)
+        htm = HTMAnomalyDetector("timestamp", "value")
+
+        htm.initialize(docker_path="../../../docker/htmDocker/", lower_data_limit=min_value, upper_data_limit=max_value)
+
         res = htm.train(unlabeled_data[file])
         for i in range(len(labeled_data[file])):
             labeled_data[file][i].append(res[i]['anomalyScore'])
