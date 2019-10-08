@@ -1,5 +1,6 @@
 # Created by Xinyu Zhu on 10/2/2019, 11:46 PM
 from collections import Iterable
+import numpy as np
 
 
 class BaseDetector:
@@ -119,12 +120,24 @@ class BaseDetector:
         """
         pass
 
+    def process_training_data(self, data, processors):
+        res = data.copy()
+        for processor in processors:
+            res = processor.processTrainingData(res)
+        return res
+
     def train(self, training_data):
         """
         This is a optional training process for the anomaly detection
         It should be call before handle_record to improve performance
         """
         pass
+
+    def process_new_data(self, data, processors):
+        res = data.copy()
+        for processor in processors:
+            res = processor.processTestingdata(res)
+        return res
 
     def handle_record(self, record):
         """
