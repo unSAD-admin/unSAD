@@ -10,6 +10,9 @@ class Dataset:
     def getData(self):
         raise NotImplementedError
 
+    def getDataBatch(self):
+        raise NotImplementedError
+
 # synthetic data
 class SynthDataset(Dataset):
     def __init__(self):
@@ -22,14 +25,16 @@ class SynthDataset(Dataset):
 
 # Get data from csv
 class CSVDataset(Dataset):
-    def __init__(self, filename, header=0, values=None, label=None, timestamp=None, test_size=0.1):
+    def __init__(self, filename, header=0, values=None, label=None, timestamp=None, test_size=0.1, batch_size=4096):
         super().__init__()
         self.filename = filename
+        self.startrow = header
         self.header = header
         self.values = values
         self.label = label
         self.timestamp = timestamp
         self.test_size = test_size
+        self.batch_size = batch_size
 
     def getData(self):
         if self.values is None:
@@ -39,17 +44,36 @@ class CSVDataset(Dataset):
             return x_train, x_test
         else:
             # Get timestamp, values, label respectively
-            t, y = [], []
             data = np.loadtxt(self.filename, skiprows=self.header, dtype=str, delimiter=',')
-            if self.timestamp is not None:
-                t = data[:, self.timestamp]
-            x = data[:, self.values].astype(np.float32)
-            if self.label is not None:
-                y = data[:, self.label]
-            t_train, t_test, x_train, x_test, y_train, y_test = train_test_split(
-                t, x, y, test_size=self.test_size, shuffle=False)
-            return {"timestamp": t_train, "values": x_train, "label": y_train},\
-                   {"timestamp": t_test, "values": x_test, "label": y_test}
+            return self.splitData(data)
+
+
+    def getDataBatch(self):
+        if self.values is None:
+            # All columns are values, no label or timestamp
+            x = np.loadtxt(self.filename, skiprows=self.startrow, dtype=np.float32,
+                           delimiter=',', max_rows=self.batch_size)
+            self.startrow += x.shape[0]
+            x_train, x_test = train_test_split(x, test_size=self.test_size, shuffle=False)
+            return x_train, x_test
+        else:
+            # Get timestamp, values, label respectively
+            data = np.loadtxt(self.filename, skiprows=self.header, dtype=str, delimiter=',',
+                              max_rows=self.batch_size)
+            self.startrow += data.shape[0]
+            return self.splitData(data)
+
+    def splitData(self, data):
+        t, y = [], []
+        if self.timestamp is not None:
+            t = data[:, self.timestamp]
+        x = data[:, self.values].astype(np.float32)
+        if self.label is not None:
+            y = data[:, self.label]
+        t_train, t_test, x_train, x_test, y_train, y_test = train_test_split(
+            t, x, y, test_size=self.test_size, shuffle=False)
+        return {"timestamp": t_train, "values": x_train, "label": y_train}, \
+               {"timestamp": t_test, "values": x_test, "label": y_test}
 
 class TestCSV(unittest.TestCase):
     def test_simple(self):
