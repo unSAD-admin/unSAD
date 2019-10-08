@@ -1,19 +1,18 @@
 import sys
 import torch
 import torch.optim as optim
-import matplotlib.pyplot as plt
 
 sys.path.append("../../")
 from detectors.base import BaseDetector
 from model import ADLSTM
 
-class LSTMAnomalyDetector(BaseDetector):
+class LSTMPredAnomalyDetector(BaseDetector):
 
     def __init__(self, timestamp_col_name=None, value_col_name=None):
         if timestamp_col_name is None:  # since timestamp column name is essential for super class
             timestamp_col_name = "timestamp"
 
-        super(LSTMAnomalyDetector, self).__init__(timestamp_col_name=timestamp_col_name,
+        super(LSTMPredAnomalyDetector, self).__init__(timestamp_col_name=timestamp_col_name,
                                                   measure_col_names=[value_col_name], symbolic=False)
 
     def initialize(self, output_size=1, seq2seq=True):
@@ -46,11 +45,13 @@ class LSTMAnomalyDetector(BaseDetector):
         with torch.no_grad():
             x_pred = self.model(x_new)
             return x_pred
+
     def visualize(self, x_train, x_pred, score, len_train):
         #####################
         # Plot preds and performance
         #####################
         # TODO: add plot for train, test, score, pred
+        import matplotlib.pyplot as plt
         plt.plot(x_train, label="Data")
         plt.plot(x_pred, label="Preds")
         plt.axvline(x=len_train, c='r', linestyle='--')

@@ -8,7 +8,7 @@ import sys
 sys.path.append("../../")
 from utils.normalizer import Normalizer
 from dataset import SynthDataset
-from detectors.lstm.lstm_detector import LSTMAnomalyDetector
+from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
 
 
 parser = argparse.ArgumentParser(description='Train and Test anomaly detection algorithm')
@@ -35,7 +35,7 @@ def main():
     x_test_torch = torch.from_numpy(x_test_norm)
     output_size = 1
     if args.model == 'lstm-seq2seq':
-        model = LSTMAnomalyDetector()
+        model = LSTMPredAnomalyDetector()
         model.initialize(output_size, seq2seq = True)
     else:
         raise ValueError("model %s not recognized" % args.model)
