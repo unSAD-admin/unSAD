@@ -1,26 +1,15 @@
-from dataset import SynthDataset
-from model import ADLSTM
-from train import Trainer
+
 import argparse
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
-# Normalize to 0-1
-# Format:numpy array
-# NOTE: only work for 1D data
-class Normalizer:
-    def __init__(self):
-        pass
-    def getNorm(self, x_train):
-        self.max = np.max(x_train)
-        self.min = np.min(x_train)
-        self.gap = self.max - self.min
-        return self.norm(x_train)
-    def norm(self, data):
-        return (data - self.min)/self.gap
-    def denorm(self, data):
-        return data * self.gap + self.min
+import sys
+sys.path.append("../../")
+from utils.normalizer import Normalizer
+from dataset import SynthDataset
+from detectors.lstm.lstm_detector import LSTMAnomalyDetector
+
 
 parser = argparse.ArgumentParser(description='Train and Test anomaly detection algorithm')
 parser.add_argument('--dataset', type=str, default='synth',
@@ -31,22 +20,6 @@ args = parser.parse_args()
 
 def anomaly_score(a, b):
     return np.linalg.norm(a-b)
-
-def viz(x_train, x_pred, score, len_train):
-    #####################
-    # Plot preds and performance
-    #####################
-    # TODO: add plot for train, test, score, pred
-    plt.plot(x_train, label="Data")
-    plt.plot(x_pred, label="Preds")
-    plt.axvline(x=len_train, c='r', linestyle='--')
-    plt.legend()
-    plt.show()
-
-    # TODO: plot training loss
-    # plt.plot(hist, label="Training loss")
-    # plt.legend()
-    # plt.show()
 
 def main():
     if args.dataset == "synth":
@@ -62,14 +35,14 @@ def main():
     x_test_torch = torch.from_numpy(x_test_norm)
     output_size = 1
     if args.model == 'lstm-seq2seq':
-        model = ADLSTM(output_size, seq2seq = True)
+        model = LSTMAnomalyDetector()
+        model.initialize(output_size, seq2seq = True)
     else:
         raise ValueError("model %s not recognized" % args.model)
-    trainer = Trainer()
-    trainer.train(model, x_train_torch.view((1, -1, output_size)), num_epoches=200)
+    model.train(x_train_torch.view((1, -1, output_size)), num_epoches=200)
 
     # put the whole sequence in pred
-    x_pred_norm = trainer.pred(model,
+    x_pred_norm = model.predict(
             torch.cat((x_train_torch, x_test_torch), 0).view((1, -1, output_size)))
     x_pred_norm = x_pred_norm[0, : ,0]
     # convert to numpy
@@ -79,7 +52,7 @@ def main():
     # de-normalize
     x_pred = normalizer.denorm(x_pred_norm)
     # visualization
-    viz(np.concatenate((x_train, x_test), 0), x_pred, score, len(x_train))
+    model.visualize(np.concatenate((x_train, x_test), 0), x_pred, score, len(x_train))
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 sys.path.append("../../")
 from detectors.base import BaseDetector
-from utils.normalizer import Normalizer
 from model import ADLSTM
 
 class LSTMAnomalyDetector(BaseDetector):
