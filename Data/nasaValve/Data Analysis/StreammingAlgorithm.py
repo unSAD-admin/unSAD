@@ -17,16 +17,16 @@ def countSubsequence(input, maxLength):
     return counter
 
 
-def prefixTable():
-    prefix_table = defaultdict(dict)
-    for key in counter:
-        if (len(key) > 1):
-            prefix = key[0:-1]
-            value = key[-1]
-            if value not in prefix_table[prefix]:
-                prefix_table[prefix][value] = 0
-            prefix_table[prefix][value] += counter[key]
-    return prefix_table
+# def prefixTable():
+#     prefix_table = defaultdict(dict)
+#     for key in counter:
+#         if (len(key) > 1):
+#             prefix = key[0:-1]
+#             value = key[-1]
+#             if value not in prefix_table[prefix]:
+#                 prefix_table[prefix][value] = 0
+#             prefix_table[prefix][value] += counter[key]
+#     return prefix_table
 
 
 def predict(tupleInput, prefix_table, reduceFactor=2):
