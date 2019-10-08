@@ -154,3 +154,6 @@ class BaseDetector:
         for record in record_sequence:
             result.append(self.handle_record(record))
         return result
+
+    def visualize(self):
+        raise NotImplementedError
