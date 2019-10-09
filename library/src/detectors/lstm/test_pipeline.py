@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("../../")
 from utils.data_processor import Normalizer
-from dataset import SynthDataset
+from common.dataset import SynthDataset
 from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
 
 
