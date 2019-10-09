@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import sys
 sys.path.append("../../")
-from utils.normalizer import Normalizer
+from utils.data_processor import Normalizer
 from dataset import SynthDataset
 from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
 
@@ -28,8 +28,8 @@ def main():
         raise ValueError("dataset %s not recognized" % args.dataset)
     x_train, x_test = dataset.getData()
     normalizer = Normalizer()
-    x_train_norm = normalizer.getNorm(x_train)
-    x_test_norm = normalizer.norm(x_test)
+    x_train_norm = normalizer.processTrainingData(x_train)
+    x_test_norm = normalizer.processTestingData(x_test)
     # convert to torch tensor
     x_train_torch = torch.from_numpy(x_train_norm)
     x_test_torch = torch.from_numpy(x_test_norm)
@@ -50,7 +50,7 @@ def main():
     # calculate score
     score = anomaly_score(x_pred_norm[-len(x_test_torch):], x_test_norm)
     # de-normalize
-    x_pred = normalizer.denorm(x_pred_norm)
+    x_pred = normalizer.recoverData(x_pred_norm)
     # visualization
     model.visualize(np.concatenate((x_train, x_test), 0), x_pred, score, len(x_train))
 
