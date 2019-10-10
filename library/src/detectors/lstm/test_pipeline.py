@@ -24,6 +24,7 @@ parser.add_argument('--model', type=str, default='lstm-seq2seq')
 parser.add_argument('--epoches', type=int, default=200)
 parser.add_argument('--thresh', type=float, default=0.25)
 parser.add_argument('--validate', help='Test on Validation set', action='store_true')
+parser.add_argument('--no_gpu', help='Test on Validation set', action='store_false')
 parser.add_argument('--test_size', help='test data percentage', default=0.4)
 parser.add_argument('--val_size',
         help='validation data percentage in total training data', default=0.1)
@@ -89,7 +90,7 @@ def main():
         output_size = 1
         if args.model == 'lstm-seq2seq':
             model = LSTMPredAnomalyDetector()
-            model.initialize(output_size, seq2seq = True)
+            model.initialize(output_size, seq2seq = True, use_gpu=args.no_gpu)
         else:
             raise ValueError("model %s not recognized" % args.model)
 

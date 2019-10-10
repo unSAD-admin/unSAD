@@ -52,6 +52,9 @@ class ADLSTM(nn.Module):
         c_0 = Variable(torch.zeros(
             self.num_layers, x.size(0), self.hidden_dim))
 
+        if x.is_cuda:
+            h_0 = h_0.cuda()
+            c_0 = c_0.cuda()
         # Propagate input through LSTM
         ula, (h_out, _) = self.lstm(x, (h_0, c_0))
         # TODO: why it's using hidden feature here:

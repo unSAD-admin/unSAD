@@ -15,14 +15,19 @@ class LSTMPredAnomalyDetector(BaseDetector):
         super(LSTMPredAnomalyDetector, self).__init__(timestamp_col_name=timestamp_col_name,
                                                   measure_col_names=[value_col_name], symbolic=False)
 
-    def initialize(self, output_size=1, seq2seq=True):
+    def initialize(self, output_size=1, seq2seq=True, use_gpu=True):
+        self.use_gpu = use_gpu and torch.cuda.is_available()
         self.model = ADLSTM(output_size, seq2seq=seq2seq)
+        if self.use_gpu:
+            self.model.cuda()
 
     # train the data for num_epoches epoches
     # @ignore_size: ignore the first few output in the sequence
     def train(self, x_train, num_epoches=200, ignore_size=0):
         # train the model
         # TODO: add non-seq2seq training
+        if self.use_gpu:
+            x_train = x_train.cuda()
         print("--------training--------")
         batch_size = 1
         output_size = 1
@@ -44,8 +49,12 @@ class LSTMPredAnomalyDetector(BaseDetector):
         # TODO: add non-seq2seq training
         # seq2seq
         print("--------prediction--------")
+        if self.use_gpu:
+            x_new = x_new.cuda()
         with torch.no_grad():
             x_pred = self.model(x_new)
+            if self.use_gpu:
+                x_pred = x_pred.cpu()
             return x_pred
 
     def visualize(self, x_train, x_pred, score, len_train):
