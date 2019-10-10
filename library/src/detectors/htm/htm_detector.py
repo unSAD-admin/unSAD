@@ -47,7 +47,7 @@ class HTMAnomalyDetector(BaseDetector):
 
         # pass an array of data to the detector
         result = self.htm.pass_block_record_to_detector(self.detector_key, ts, vs)
-        print(result)
+        #print(result)
         return result
 
 
