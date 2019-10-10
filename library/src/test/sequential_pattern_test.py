@@ -7,7 +7,7 @@ sys.path.append("../")
 from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
-from utils.analysis import drawArray
+from utils.analysis import draw_array
 from utils.collection_tools import simple_filter, mean_filter
 
 
@@ -70,5 +70,5 @@ if __name__ == '__main__':
 
     result = simple_filter(result, mean_filter, window_size)
     # print(result)
-    drawArray(result)
+    draw_array(result)
     # detector.handle_record_sequence()

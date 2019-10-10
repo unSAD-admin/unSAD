@@ -33,7 +33,6 @@ class HTMAnomalyDetector(BaseDetector):
             raise RuntimeError("Data input does not match the input format")
 
         result = self.htm.pass_record_to_detector(self.detector_key, record[0], record[1])  # (key,timestamp,value)
-        print(result)
         return result
 
     def train(self, training_data):

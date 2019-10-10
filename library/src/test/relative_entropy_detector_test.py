@@ -1,7 +1,7 @@
 # Created by Xinyu Zhu on 10/7/2019, 12:53 AM
 import sys
 
-from analysis import drawArray
+from analysis import draw_array
 
 sys.path.append("../")
 
@@ -30,4 +30,4 @@ if __name__ == '__main__':
 
     print(all_result)
 
-    drawArray(all_result)
+    draw_array(all_result)
