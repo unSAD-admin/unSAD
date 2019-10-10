@@ -42,6 +42,7 @@ class ADLSTM(nn.Module):
                             num_layers=self.num_layers, batch_first=True)
         # output dimension is 1
         self.fc = nn.Linear(self.hidden_dim, output_size)
+        self.initialize()
 
     def forward(self, x):
         # TODO: move lstm intialization to a separate function
@@ -63,6 +64,13 @@ class ADLSTM(nn.Module):
             h_out = h_out[-1].view(-1, self.hidden_dim)
             out = self.fc(h_out)
         return out
+
+    def initialize(self):
+        for name, param in self.named_parameters():
+            if 'bias' in name:
+                nn.init.constant_(param, 0.0)
+            elif 'weight' in name:
+                nn.init.xavier_normal_(param)
 
 
 

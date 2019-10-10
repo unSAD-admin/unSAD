@@ -72,7 +72,7 @@ def main():
         x_test_norm = normalizer.processTestingData(x_test)
         # train, val split
         if args.validate:
-            x_train_norm, x_val_norm, y_train, y_val = train_test_split(x_train, y_train,
+            x_train_norm, x_val_norm, y_train, y_val = train_test_split(x_train_norm, y_train,
                 test_size=args.val_size, shuffle=False)
             x_val_torch = torch.from_numpy(x_val_norm)
         # convert to torch tensor
@@ -106,7 +106,7 @@ def main():
                 x_pred_norm[len(x_train_torch):len(x_train_torch)+len(x_val_torch)], x_val_norm)
             test_score = anomaly_score(
                 x_pred_norm[-len(x_test_torch):], x_test_norm)
-            # conf_mat = confusion_matrix((score > args.thresh).astype(int),
+            # conf_mat = confusion_matrix((score < args.thresh).astype(int),
             #         y_val, labels=[0,1]).ravel()
             # conf_mat_list.append(conf_mat)
             val_score_list.append(val_score)
@@ -116,7 +116,7 @@ def main():
         else:
             # if there is label
             # try:
-            #     conf_mat = confusion_matrix((score > args.thresh).astype(int),
+            #     conf_mat = confusion_matrix((score < args.thresh).astype(int),
             #             y_test, labels=[0,1]).ravel()
             #     conf_mat_list.append(conf_mat)
             # except NameError:
@@ -124,7 +124,7 @@ def main():
             # de-normalize
             x_pred = normalizer.recoverData(x_pred_norm)
             # visualization
-            model.visualize(np.concatenate((x_train, x_test), 0), x_pred, score, len(x_train))
+            model.visualize(np.concatenate((x_train, x_test), 0), x_pred, test_score, len(x_train))
     # rate_list = []
     # for i in range(4):
     #     rate = sum([a[i] for a in conf_mat_list])
