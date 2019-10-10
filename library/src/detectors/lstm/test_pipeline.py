@@ -29,6 +29,8 @@ parser.add_argument('--val_size',
         help='validation data percentage in total training data', default=0.1)
 parser.add_argument('--window_size',
         help='percentage of data to ignore in calculating the loss', default=45)
+parser.add_argument('--save_dir', type=str, default='results',
+    help='directory to save file')
 args = parser.parse_args()
 
 def anomaly_score(a, b):
@@ -141,10 +143,13 @@ def main():
         total_test_score = np.concatenate(tuple(test_score_list), 0)
         total_y_val = np.concatenate(tuple(y_val_list), 0)
         total_y_test = np.concatenate(tuple(y_test_list), 0)
-        np.save("total_val_score", total_val_score)
-        np.save("total_test_score", total_test_score)
-        np.save("total_y_val", total_y_val)
-        np.save("total_y_test", total_y_test)
+        import os
+        if not os.path.exists(args.save_dir):
+            os.makedirs(args.save_dir)
+        np.save(args.save_dir + "/total_val_score", total_val_score)
+        np.save(args.save_dir + "/total_test_score", total_test_score)
+        np.save(args.save_dir + "/total_y_val", total_y_val)
+        np.save(args.save_dir + "/total_y_test", total_y_test)
 
     # Do something with confusion matrix
 if __name__ == "__main__":
