@@ -6,6 +6,8 @@ import os
 import json
 import datetime
 import csv
+import time
+
 
 def load_data_label():
     file_2_data = load_data()
@@ -111,14 +113,17 @@ def writecsv(file,filename):
         writer.writerow(line)
     csvfile.close()
 
+
 if __name__ == '__main__':
     labeled_data, unlabeled_data = load_data_label()
     print ('load labeled data over, try to improve htm')
-    
+    cur_time = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()) 
+    directory = str(cur_time) + '_res'
+    os.mkdir(str(directory))
+
     print('test train by real data')
 
     threshold = 0.512250003693
-    print (len(unlabeled_data))
     all_res = []
     cnt = 0
     for file in unlabeled_data:
@@ -145,7 +150,11 @@ if __name__ == '__main__':
                 labeled_data[file][i].append(1)
             else:
                 labeled_data[file][i].append(0)
+        writecsv(labeled_data[file], os.path.join(directory, file))
+
         f1, precision, recall = cal_f_one(labeled_data[file], 2, 4)
+
         all_res.append([file, f1, precision,recall])
         
-    writecsv(all_res, 'all_res.csv')
+
+    writecsv(all_res, os.path.join(directory, 'all_res.csv'))
