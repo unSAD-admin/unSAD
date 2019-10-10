@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--seed', type=int, default=1234,
         help = 'seed for numpy and torch to maintain reproducibility')
 parser.add_argument('--dataset', type=str, default='synth',
-        choices=['synth','yahoo'], help='type of dataset to use')
+        choices=['synth','yahoo', 'nsa'], help='type of dataset to use')
 parser.add_argument('--file_prefix', type=str, default='',
         help='filepath for the data file')
 parser.add_argument('--model', type=str, default='lstm-seq2seq')
@@ -47,7 +47,7 @@ def main():
     if args.dataset == "synth":
         # This is a hack, only one data file
         file_list = [""]
-    elif args.dataset == 'yahoo':
+    elif args.dataset == 'yahoo' or args.dataset == 'nsa':
         file_list = glob.glob(args.file_prefix+"*")
     else:
         raise ValueError("dataset %s not recognized" % args.dataset)
@@ -58,6 +58,14 @@ def main():
         elif args.dataset == 'yahoo':
             dataset = CSVDataset(filename, header = 1, values = 1, label = 2,
                     timestamp = 0, test_size=args.test_size)
+            data_train, data_test = dataset.getData()
+            x_train, y_train = data_train["values"], data_train["label"]
+            x_test, y_test = data_test["values"], data_test["label"]
+            y_train = y_train.astype(int)
+            y_test = y_test.astype(int)
+        elif args.dataset == 'nsa':
+            dataset = CSVDataset(filename, timestamp=0, values=1, label=2,
+                    test_size=args.test_size)
             data_train, data_test = dataset.getData()
             x_train, y_train = data_train["values"], data_train["label"]
             x_test, y_test = data_test["values"], data_test["label"]
@@ -122,7 +130,7 @@ def main():
             # de-normalize
             x_pred = normalizer.recoverData(x_pred_norm)
             # visualization
-            model.visualize(np.concatenate((x_train, x_test), 0), x_pred, score, len(x_train))
+            model.visualize(np.concatenate((x_train, x_test), 0), x_pred, test_score, len(x_train))
     # rate_list = []
     # for i in range(4):
     #     rate = sum([a[i] for a in conf_mat_list])
