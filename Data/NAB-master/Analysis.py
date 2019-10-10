@@ -71,10 +71,21 @@ def toTableauFormat(data):
                 obj["a" + str(atti)] = val
                 atti += 1
             if key in labelinfo and obj["a0"] in labelinfo[key]:
-                obj["label"] = 1;
+                obj["label"] = 1
             processedData.append(obj)
 
     return processedData
+
+def toCSVFormat(data):
+    labelinfo = readLabel()
+    dir_path = "./csv/"
+    for key in data:
+        with open(os.path.join(dir_path, key), 'w') as f:
+            for record in data[key]:
+                label = 0;
+                if key in labelinfo and record[0] in labelinfo[key]:
+                    label = 1
+                f.write("%f,%f,%d\n"%(record[0], record[1], label))
 
 
 def readLabel():
@@ -96,8 +107,9 @@ def readLabel():
     return anomaly
 
 if __name__ == '__main__':
-    result = toTableauFormat(readAllData())
-    with open("allNABData.json", "w") as f:
-        for r in result:
-            f.write(json.dumps(r) + "\n")
+    toCSVFormat(readAllData())
+    # result = toTableauFormat(readAllData())
+    # with open("allNABData.json", "w") as f:
+    #     for r in result:
+    #         f.write(json.dumps(r) + "\n")
     # readLabel()
