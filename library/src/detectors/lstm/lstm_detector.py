@@ -18,7 +18,9 @@ class LSTMPredAnomalyDetector(BaseDetector):
     def initialize(self, output_size=1, seq2seq=True):
         self.model = ADLSTM(output_size, seq2seq=seq2seq)
 
-    def train(self, x_train, num_epoches=200):
+    # train the data for num_epoches epoches
+    # @ignore_size: ignore the first few output in the sequence
+    def train(self, x_train, num_epoches=200, ignore_size=0):
         # train the model
         # TODO: add non-seq2seq training
         print("--------training--------")
@@ -31,7 +33,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
             # Zero out gradient,
             optimiser.zero_grad()
             x_pred = self.model(x_train)
-            loss = loss_fn(x_pred, x_train)
+            loss = loss_fn(x_pred[:,ignore_size:,], x_train[:,ignore_size:,])
             # TODO: what is the loss for ocnn
             # Backward pass
             loss.backward()
