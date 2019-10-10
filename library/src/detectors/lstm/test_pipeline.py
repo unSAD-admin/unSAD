@@ -39,9 +39,11 @@ def main():
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    conf_mat_list = []
-    score_list = []
+    # conf_mat_list = []
+    val_score_list = []
+    test_score_list = []
     y_val_list = []
+    y_test_list = []
     if args.dataset == "synth":
         # This is a hack, only one data file
         file_list = [""]
@@ -96,37 +98,45 @@ def main():
         # convert to numpy
         x_pred_norm = x_pred_norm.numpy()
         # calculate score
+        test_score = anomaly_score(x_pred_norm[-len(x_test_torch):], x_test_norm)
         if args.validate:
-            score = anomaly_score(
+            val_score = anomaly_score(
                 x_pred_norm[len(x_train_torch):len(x_train_torch)+len(x_val_torch)], x_val_norm)
-            conf_mat = confusion_matrix((score > args.thresh).astype(int),
-                    y_val, labels=[0,1]).ravel()
-            conf_mat_list.append(conf_mat)
-            score_list.append(score)
+            test_score = anomaly_score(
+                x_pred_norm[-len(x_test_torch):], x_test_norm)
+            # conf_mat = confusion_matrix((score > args.thresh).astype(int),
+            #         y_val, labels=[0,1]).ravel()
+            # conf_mat_list.append(conf_mat)
+            val_score_list.append(val_score)
+            test_score_list.append(test_score)
             y_val_list.append(y_val)
+            y_test_list.append(y_test)
         else:
-            score = anomaly_score(x_pred_norm[-len(x_test_torch):], x_test_norm)
             # if there is label
-            try:
-                conf_mat = confusion_matrix((score > args.thresh).astype(int),
-                        y_test, labels=[0,1]).ravel()
-                conf_mat_list.append(conf_mat)
-            except NameError:
-                pass
+            # try:
+            #     conf_mat = confusion_matrix((score > args.thresh).astype(int),
+            #             y_test, labels=[0,1]).ravel()
+            #     conf_mat_list.append(conf_mat)
+            # except NameError:
+            #     pass
             # de-normalize
             x_pred = normalizer.recoverData(x_pred_norm)
             # visualization
             model.visualize(np.concatenate((x_train, x_test), 0), x_pred, score, len(x_train))
-    rate_list = []
-    for i in range(4):
-        rate = sum([a[i] for a in conf_mat_list])
-        rate_list.append(rate)
-    print("confusion matrix(tn, fp, fn, tp): ", rate_list)
+    # rate_list = []
+    # for i in range(4):
+    #     rate = sum([a[i] for a in conf_mat_list])
+    #     rate_list.append(rate)
+    # print("confusion matrix(tn, fp, fn, tp): ", rate_list)
     if args.validate:
-        total_score = np.concatenate(tuple(score_list), 0)
+        total_val_score = np.concatenate(tuple(val_score_list), 0)
+        total_test_score = np.concatenate(tuple(test_score_list), 0)
         total_y_val = np.concatenate(tuple(y_val_list), 0)
-        np.save("total_score", total_score)
+        total_y_test = np.concatenate(tuple(y_test_list), 0)
+        np.save("total_val_score", total_val_score)
+        np.save("total_test_score", total_test_score)
         np.save("total_y_val", total_y_val)
+        np.save("total_y_test", total_y_test)
 
     # Do something with confusion matrix
 if __name__ == "__main__":
