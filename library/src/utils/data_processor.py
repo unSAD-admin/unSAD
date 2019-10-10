@@ -42,6 +42,13 @@ class Normalizer(BaseDataProcessor):
 #TODO(Xingyang Liu) Add more data processors
 
 class TestNormalizer(unittest.TestCase):
+    def test_single(self):
+        x = np.array([0., 1., 2., 3., 4., 5.])
+        x_n = np.array([0., 0.2, 0.4, 0.6, 0.8, 1.])
+        normalizer = Normalizer()
+        res = normalizer.processTrainingData(x)
+        self.assertTrue(np.allclose(res, x_n), msg=res)
+
     def test_simple(self):
         x = np.array([[ 1., -1.,  2.],[ 2.,  0.,  0.],[ 0.,  1., -1.]])
         x_n = np.array([[ 0.5, 0,  1.],[ 1.,  0.5,  1.0/3],[ 0.,  1., 0]])
