@@ -54,7 +54,7 @@ def main():
             x_test, y_test = data_test["values"], data_test["label"]
         else:
             raise ValueError("dataset %s not recognized" % args.dataset)
-        normalizer = Normalizer()
+        normalizer = Normalizer(zero_mean=True)
         x_train_norm = normalizer.processTrainingData(x_train)
         x_test_norm = normalizer.processTestingData(x_test)
         # train, val split

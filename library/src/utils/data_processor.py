@@ -15,8 +15,9 @@ class BaseDataProcessor:
         raise NotImplementedError
 
 class Normalizer(BaseDataProcessor):
-    def __init__(self):
+    def __init__(self, zero_mean = False):
         super().__init__()
+        self.zero_mean = zero_mean
 
     def processTrainingData(self, data):
         self.max = np.max(data, axis=0)
@@ -28,10 +29,15 @@ class Normalizer(BaseDataProcessor):
         return self._norm(data)
 
     def recoverData(self, data):
-        return data * self.gap + self.min
+        if self.zero_mean:
+            data = (data + 1) / 2.
+        return  data * self.gap + self.min
 
     def _norm(self, x):
-        return (x - self.min) / self.gap
+        data = (x - self.min) / self.gap
+        if self.zero_mean:
+            data = data * 2. - 1
+        return data
 
 #TODO(Xingyang Liu) Add more data processors
 
