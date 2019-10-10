@@ -19,7 +19,7 @@ class SynthDataset(Dataset):
         super().__init__()
 
     def getData(self):
-        x_train = np.sin(np.linspace(-np.pi, np.pi, 201, dtype = np.float32))
+        x_train = np.sin(np.linspace(-np.pi, 3*np.pi, 401, dtype = np.float32))
         x_test = np.sin(np.linspace(-np.pi, np.pi, 201, dtype = np.float32))
         return x_train, x_test
 
