@@ -2,6 +2,7 @@
 import glob
 import argparse
 import numpy as np
+import random
 import torch
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
@@ -20,8 +21,8 @@ parser.add_argument('--dataset', type=str, default='synth',
         choices=['synth','yahoo', 'nab'], help='type of dataset to use')
 parser.add_argument('--file_prefix', type=str, default='',
         help='filepath for the data file')
-parser.add_argument('--model', type=str, default='lstm-seq2seq')
-parser.add_argument('--epoches', type=int, default=200)
+parser.add_argument('--model', type=str, default='lstm', choices=['lstm','cnn'])
+parser.add_argument('--epoches', type=int, default=300)
 parser.add_argument('--thresh', type=float, default=0.25)
 parser.add_argument('--validate', help='Test on Validation set', action='store_true')
 parser.add_argument('--no_gpu', help='Test on Validation set', action='store_false')
@@ -30,9 +31,15 @@ parser.add_argument('--val_size',
         help='validation data percentage in total training data', default=0.1)
 parser.add_argument('--window_size',
         help='percentage of data to ignore in calculating the loss', default=45)
+parser.add_argument('--seq2seq', help='use sequence to sequence model',
+        action='store_true')
+parser.add_argument('--verbose', help='use to print loss', action='store_true')
 parser.add_argument('--save_dir', type=str, default='results',
     help='directory to save file')
 args = parser.parse_args()
+if args.model == 'cnn' and args.seq2seq:
+    args.seq2seq = False
+    print("WARNING: cnn must be non-seq2seq")
 
 def anomaly_score(a, b):
     return np.abs(a-b)
@@ -41,6 +48,7 @@ def main():
     # reproducibility
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
+    random.seed(args.seed)
 
     # conf_mat_list = []
     val_score_list = []
@@ -88,15 +96,16 @@ def main():
         x_train_torch = torch.from_numpy(x_train_norm)
         x_test_torch = torch.from_numpy(x_test_norm)
         output_size = 1
-        if args.model == 'lstm-seq2seq':
+        if args.model in ['lstm', 'cnn']:
             model = LSTMPredAnomalyDetector()
-            model.initialize(output_size, seq2seq = True, use_gpu=args.no_gpu)
+            model.initialize(output_size, seq2seq = args.seq2seq,
+                    use_gpu=args.no_gpu, window_size=args.window_size, model=args.model)
         else:
             raise ValueError("model %s not recognized" % args.model)
 
         # train the model
         model.train(x_train_torch.view((1, -1, output_size)),
-                num_epoches=args.epoches, ignore_size=args.window_size)
+                num_epoches=args.epoches, verbose=args.verbose)
 
         # put the whole sequence in pred
         if args.validate:
@@ -104,7 +113,7 @@ def main():
         else:
             x_total = torch.cat((x_train_torch, x_test_torch), 0)
         # predict
-        x_pred_norm = model.predict(x_total.view((1, -1, output_size)))
+        x_pred_norm = model.predict(x_total.view((1, -1, output_size)), start=x_train_torch.shape[0])
         x_pred_norm = x_pred_norm[0, : ,0]
         # convert to numpy
         x_pred_norm = x_pred_norm.numpy()

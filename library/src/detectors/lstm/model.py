@@ -13,21 +13,37 @@ class ADCNN(nn.Module):
         #  in_channels, out_channels, kernel_size
         self.window_size = window_size
         self.conv1 = nn.Conv1d(1, 32, 3, padding=1)
+        # self.bn1 = nn.BatchNorm1d(32)
         self.maxpool1 = nn.MaxPool1d(2)
         self.conv2 = nn.Conv1d(32, 32, 3, padding=1)
+        # self.bn2 = nn.BatchNorm2d(32)
         self.maxpool2 = nn.MaxPool1d(2)
         self.fc = nn.Linear(window_size//4*32, output_size)
+        self.initialize()
 
     def forward(self, x):
+        x = x.new(x.shape[0], x.shape[2], x.shape[1])
         x = self.conv1(x)
+        # x = self.bn1(x)
         x =  F.relu(x)
         x = self.maxpool1(x)
         x =  self.conv2(x)
+        # x = self.bn2(x)
         x = F.relu(x)
         x = self.maxpool2(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
+        # Sigmoid to avoid explode
+        # x = 2 *  torch.sigmoid(x) - 1
+        x  = torch.clamp(x, -1, 1)
         return x
+
+    def initialize(self):
+        for name, param in self.named_parameters():
+            if 'bias' in name:
+                nn.init.constant_(param, 0.0)
+            elif 'weight' in name and param.dim() > 1:
+                nn.init.xavier_normal_(param)
 
 # reference: https://github.com/jessicayung/blog-code-snippets/blob/master/lstm-pytorch/lstm-baseline.py
 class ADLSTM(nn.Module):
@@ -84,7 +100,7 @@ class TestCNNDims(unittest.TestCase):
             for output_size in [1, 10, 100]:
                 adcnn = ADCNN(window_size, output_size)
                 # 3d input
-                x = np.ones([batch_size, 1, window_size], dtype=np.float32)
+                x = np.ones([batch_size, window_size, 1], dtype=np.float32)
                 x = torch.FloatTensor(torch.from_numpy(x))
                 y =  adcnn(x)
                 self.assertEqual(y.shape, torch.Size([batch_size, output_size]))
