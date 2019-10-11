@@ -5,9 +5,17 @@ import datetime
 import csv
 import time
 
+def writecsv(file,filename):
+    csvfile = open(filename, 'w')
+    writer = csv.writer(csvfile,lineterminator='\n')
+    for line in file:
+        writer.writerow(line)
+    csvfile.close()
+
 
 def cal_window_f1(path, window_size=50):
     files = {}
+    output = []
     for dirpath, dirnames, filenames in os.walk(path):
 
         for filename in filenames:
@@ -30,7 +38,6 @@ def cal_window_f1(path, window_size=50):
             for base in range(0, len(data), window_size):
                 tot_window += 1
                 end = min(base + window_size, len(data))
-                
                 window_label = 0
                 window_res = 0
                 for i in range(base, end):
@@ -60,7 +67,8 @@ def cal_window_f1(path, window_size=50):
                 f1 = 2 * precision * recall / ( precision + recall )
             print ('---------', filename, f1, precision, recall, '--------')
             files[filename] = [f1, precision, recall]
-
+            output.append([filename, f1, precision, recall])
+    writecsv(output, 'window_evaluation.csv')
 if __name__ == '__main__':
     cal_window_f1('2019-10-10_00:09:18_res')
             
