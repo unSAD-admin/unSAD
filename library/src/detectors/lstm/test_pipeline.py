@@ -124,7 +124,7 @@ def main():
                 x_pred_norm[len(x_train_torch):len(x_train_torch)+len(x_val_torch)], x_val_norm)
             test_score = anomaly_score(
                 x_pred_norm[-len(x_test_torch):], x_test_norm)
-            # conf_mat = confusion_matrix((score < args.thresh).astype(int),
+            # conf_mat = confusion_matrix((score > args.thresh).astype(int),
             #         y_val, labels=[0,1]).ravel()
             # conf_mat_list.append(conf_mat)
             val_score_list.append(val_score)
@@ -134,7 +134,7 @@ def main():
         else:
             # if there is label
             # try:
-            #     conf_mat = confusion_matrix((score < args.thresh).astype(int),
+            #     conf_mat = confusion_matrix((score > args.thresh).astype(int),
             #             y_test, labels=[0,1]).ravel()
             #     conf_mat_list.append(conf_mat)
             # except NameError:
