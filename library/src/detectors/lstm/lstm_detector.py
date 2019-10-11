@@ -129,15 +129,24 @@ class LSTMPredAnomalyDetector(BaseDetector):
         return torch.cat((x_new[:start,], x_pred), 0).unsqueeze(0)
 
     # TODO: put this in base detector
-    def visualize(self, x_train, x_pred, score, len_train):
+    def visualize(self, x_train, x_pred, score, y_label, len_train):
         #####################
         # Plot preds and performance
         #####################
         # TODO: add plot for train, test, score, pred
         import matplotlib.pyplot as plt
+        # import numpy as np
+        # x_pred = np.load("x_pred.npy")
         plt.plot(x_train, label="Data")
         plt.plot(x_pred, label="Preds")
         plt.axvline(x=len_train, c='r', linestyle='--')
+        x_list = []
+        y_list = []
+        for index, value in enumerate(list(y_label)):
+            if value == 1:
+                x_list.append(index)
+                y_list.append(x_train[index])
+        plt.plot(x_list, y_list, 'ro')
         plt.legend()
         plt.show()
 

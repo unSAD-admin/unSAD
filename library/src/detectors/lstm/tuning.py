@@ -14,7 +14,7 @@ total_y_test = np.load(args.save_dir + "/total_y_test.npy")
 
 f1_val_list = []
 f1_test_list = []
-thresh_list = [a/10. for a in list(range(0, 20, 1))]
+thresh_list = [a/10. for a in list(range(0, 15, 1))]
 for thresh in thresh_list:
     tn, fp, fn, tp = confusion_matrix(total_y_val,
             (total_val_score > thresh).astype(int), labels=[0,1]).ravel()
@@ -25,5 +25,9 @@ for thresh in thresh_list:
 
 # import pdb;pdb.set_trace()
 import matplotlib.pyplot as plt
-plt.plot(thresh_list, f1_val_list)
+plt.plot(thresh_list, f1_test_list)
+# plt.title('A4Benchmark')
+plt.ylim([0.,1.])
+plt.xlabel('threshold')
+plt.ylabel('f1 score')
 plt.show()

@@ -84,6 +84,12 @@ def main():
             y_test = y_test.astype(int)
         else:
             raise ValueError("dataset %s not recognized" % args.dataset)
+
+        # import matplotlib.pyplot as plt
+        # plt.plot(np.concatenate((x_train, x_test), 0) , label="A4Benchmark-TS74")
+        # # plt.axvline(x=len_train, c='r', linestyle='--')
+        # plt.legend()
+        # plt.show()
         normalizer = Normalizer(zero_mean=True)
         x_train_norm = normalizer.processTrainingData(x_train)
         x_test_norm = normalizer.processTestingData(x_test)
@@ -142,7 +148,8 @@ def main():
             # de-normalize
             x_pred = normalizer.recoverData(x_pred_norm)
             # visualization
-            model.visualize(np.concatenate((x_train, x_test), 0), x_pred, test_score, len(x_train))
+            model.visualize(np.concatenate((x_train, x_test), 0),
+                    x_pred, test_score, np.concatenate((y_train, y_test), 0), len(x_train))
     # rate_list = []
     # for i in range(4):
     #     rate = sum([a[i] for a in conf_mat_list])
