@@ -140,7 +140,6 @@ class HTMApiProvider:
         }
         rt = []
         result = self.api_client.call_with_data("handle_block", [key], data)
-        print(result)
         result = json.loads(result)["result"]
         for record in result:
             record = record.split(",")
