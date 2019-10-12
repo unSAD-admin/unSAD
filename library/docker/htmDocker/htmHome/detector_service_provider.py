@@ -34,7 +34,7 @@ def set_max(new_max=10):
 def handle_record(key, timestamp, value):
     record = {
         "timestamp": datetime.fromtimestamp(float(timestamp)),
-        "value": float(value)
+        "value": float(value),
     }
     result = detectorServiceProvider.handle_record(record, key)
 
@@ -60,6 +60,11 @@ def handle_block(key):
         "result": result
     }
     return str(result_obj).replace("'", '"')
+
+
+@app.route("/health_check")
+def health_check():
+    return "success"
 
 
 if __name__ == '__main__':

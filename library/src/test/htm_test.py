@@ -32,27 +32,27 @@ def read_result(file_path):
 
 
 if __name__ == '__main__':
-    # # file_path = "../../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
-    # # data = read_file(file_path)
-    # # min_value = 10e10
-    # # max_value = -10e10
-    # # for record in data:
-    # #     if min_value > record[1]:
-    # #         min_value = record[1]
-    # #     if max_value < record[1]:
-    # #         max_value = record[1]
-    # # print(min_value, max_value)
-    # #
-    # # detector = HTMAnomalyDetector("timestamp", "value")
-    # # detector.initialize("../../docker/htmDocker", probation_number=int(len(data) * 0.10), lower_data_limit=min_value,
-    # #                     upper_data_limit=max_value)
-    # #
-    # # result = detector.train(data)
-    # # result_anomaly_score = []
-    # # for r in result:
-    # #     result_anomaly_score.append(r["anomalyScore"])
-    #
-    # draw_array(result_anomaly_score)
+    file_path = "../../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
+    data = read_file(file_path)
+    min_value = 10e10
+    max_value = -10e10
+    for record in data:
+        if min_value > record[1]:
+            min_value = record[1]
+        if max_value < record[1]:
+            max_value = record[1]
+    print(min_value, max_value)
+
+    detector = HTMAnomalyDetector("timestamp", "value")
+    detector.initialize("../../docker/htmDocker", probation_number=int(len(data) * 0.10), lower_data_limit=min_value,
+                        upper_data_limit=max_value)
+
+    result = detector.train(data)
+    result_anomaly_score = []
+    for r in result:
+        result_anomaly_score.append(r["anomalyScore"])
+
+    draw_array(result_anomaly_score)
 
     result_path = "../../data/NAB_data/results/numenta/realAWSCloudwatch/numenta_ec2_cpu_utilization_5f5533.csv"
 

@@ -8,3 +8,5 @@ def draw_array(sequence):
     x = range(len(sequence))
     plt.plot(x, sequence)
     plt.show()
+
+

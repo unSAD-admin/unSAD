@@ -40,7 +40,7 @@ class HTMApiProvider:
                 self.port = port
                 self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
                 print("Testing whether the docker is set up")
-                if not self.recycle_detector():
+                if not self.health_check():
                     ip = None
             if ip is None:
                 raise RuntimeError("Ooops! Something goes wrong which the docker environment! Don't worry"
@@ -82,6 +82,10 @@ class HTMApiProvider:
                     "Please either provide an docker path for the program to initialize the docker "
                     "environment or set up an accessible docker environment and provide"
                     " an ip address(for example: 127.0.0.1) to the APIs")
+
+    def health_check(self):
+        result = self.api_client.call(path="health_check")
+        return result == "success"
 
     def set_max_detector_num(self, num=10):
         """
@@ -136,6 +140,7 @@ class HTMApiProvider:
         }
         rt = []
         result = self.api_client.call_with_data("handle_block", [key], data)
+        print(result)
         result = json.loads(result)["result"]
         for record in result:
             record = record.split(",")

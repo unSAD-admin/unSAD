@@ -61,4 +61,5 @@ if __name__ == '__main__':
     # testing train()
     print("Testing train()")
     for i in range(5):
-        htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
+        result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
+        print(result)
