@@ -22,6 +22,9 @@ class HTMAnomalyDetector(BaseDetector):
         # Create HTMApiProvider
         self.htm = HTMApiProvider(docker_path)
 
+        if "max_detector_num" in kwargs:
+            self.htm.set_max_detector_num(kwargs[ "max_detector_num"])
+
         # Create new detector with default parameters
         self.detector_key = self.htm.create_new_detector(lower_data_limit, upper_data_limit, probation_number,
                                                          spatial_tolerance)  # keep the detector_key

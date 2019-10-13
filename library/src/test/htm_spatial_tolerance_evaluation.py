@@ -3,6 +3,9 @@
 import sys
 import datetime
 import json
+import time
+
+from annotations import simple_thread
 
 sys.path.append("../")
 
@@ -67,9 +70,11 @@ if __name__ == '__main__':
     {"path":[{"spatial_tolerance":tolerance, "F1 score":F1, "Precision": precision, "Recall": Recall}, ..]
     """
     result = {}
-    detector = HTMAnomalyDetector("timestamp", "value")
-    for spatial_tolerance in spatial_tolerance_to_test:
 
+
+    @simple_thread
+    def run_test(spatial_tolerance, result_collector):
+        detector = HTMAnomalyDetector("timestamp", "value")
         for key in data:
 
             if key not in result:
@@ -85,7 +90,7 @@ if __name__ == '__main__':
                     max_value = data_value[i]["value"]
 
             detector.initialize("../../docker/htmDocker", probation_number=probation_number, lower_data_limit=min_value,
-                                upper_data_limit=max_value, spatial_tolerance=spatial_tolerance)
+                                upper_data_limit=max_value, spatial_tolerance=spatial_tolerance, max_detector_num=200)
 
             training_data = []
             for record in data_value:
@@ -145,6 +150,18 @@ if __name__ == '__main__':
                 "spatial_tolerance": spatial_tolerance, "F": f_score, "precision": precision, "recall": recall
             })
 
+            result_collector.append(spatial_tolerance)
+
+
+    #detector = HTMAnomalyDetector("timestamp", "value")
+    result_collector = []
+    for spatial_tolerance in spatial_tolerance_to_test:
+        run_test(spatial_tolerance, result_collector)
+
+    while (len(result_collector) < len(spatial_tolerance_to_test)):
+        time.sleep(60)
+        print(result_collector)
+
     data_result = []
     for key in result:
         for r in result[key]:
@@ -157,6 +174,6 @@ if __name__ == '__main__':
             }
             data_result.append(obj)
 
-    with open("spatial_tolerance_experiment_result.json", "w") as f:
+    with open("spatial_tolerance_experiment_result.json", "a") as f:
         for data_record in data_result:
             f.write(json.dumps(data_record) + "\n")
