@@ -5,10 +5,10 @@ import datetime
 import json
 import time
 
-from annotations import simple_thread
+
 
 sys.path.append("../")
-
+from utils.annotations import simple_thread
 from detectors.htm.htm_detector import HTMAnomalyDetector
 
 
