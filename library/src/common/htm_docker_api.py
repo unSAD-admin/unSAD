@@ -43,7 +43,7 @@ class HTMApiProvider:
                 if not self.health_check():
                     ip = None
             if ip is None:
-                raise RuntimeError("Ooops! Something goes wrong which the docker environment! Don't worry"
+                raise Exception("Ooops! Something goes wrong which the docker environment! Don't worry"
                                    "This is a step by step instruction for you to make it work."
                                    "1. Make sure docker is installed in your environment correctly. Open a "
                                    "command line tools and type in docker, you should be able to see some response"
@@ -60,7 +60,7 @@ class HTMApiProvider:
                                    "docker run -p 127.0.0.1:8081:8081 -it [91bf6cb14f72]"
                                    "this will start you docker instance. And you will be inside the docker "
                                    "environment automatically. Now start the server program inside the docker:"
-                                   "python /home/htmHome/detector_service_provider.py"
+                                   "nohup python /home/htmHome/detector_service_provider.py"
                                    "If you see something like: Running on http://0.0.0.0:8081/ (Press CTRL+C to quit)"
                                    "You are done, maintain the command line session there, don't close it and "
                                    "rerun this program, it should work."
@@ -72,13 +72,13 @@ class HTMApiProvider:
             self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
 
         else:
-            if docker_ip is not None:
+            if docker_ip is not None or docker_ip == "":
                 print("User didn't provide a docker path, assume the ip address is provided")
                 self.ip = docker_ip
                 self.port = port
                 self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
             else:
-                raise RuntimeError(
+                raise Exception(
                     "Please either provide an docker path for the program to initialize the docker "
                     "environment or set up an accessible docker environment and provide"
                     " an ip address(for example: 127.0.0.1) to the APIs")
@@ -87,7 +87,7 @@ class HTMApiProvider:
         result = self.api_client.call(path="health_check")
         return result == "success"
 
-    def set_max_detector_num(self, num=10):
+    def set_max_detector_num(self, num=100):
         """
         You need to set the maximum detector number supported by the docker server
         The server can only maintain a certain number of detector at the same time
