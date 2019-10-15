@@ -33,7 +33,7 @@ class HTMApiProvider:
             ip = None
             try:
                 ip = init_docker_environment(docker_path, tag=tag)
-                ip = "127.0.0.1"
+                #ip = "127.0.0.1"
                 print("Got ip address:", ip, "from python docker API")
             except Exception:
                 ip = "127.0.0.1"
