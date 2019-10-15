@@ -33,6 +33,7 @@ class HTMApiProvider:
             ip = None
             try:
                 ip = init_docker_environment(docker_path, tag=tag)
+                #ip = "127.0.0.1"
                 print("Got ip address:", ip, "from python docker API")
             except Exception:
                 ip = "127.0.0.1"
@@ -43,42 +44,70 @@ class HTMApiProvider:
                 if not self.health_check():
                     ip = None
             if ip is None:
-                raise RuntimeError("Ooops! Something goes wrong which the docker environment! Don't worry"
-                                   "This is a step by step instruction for you to make it work."
-                                   "1. Make sure docker is installed in your environment correctly. Open a "
-                                   "command line tools and type in docker, you should be able to see some response"
-                                   "2. Maker sure you pass in a correct docker_path, a Dockerfile should be"
-                                   "under docker_path, if you are using relative path, make sure it is correct"
-                                   "3. Ok, there may be some trouble with your environment, for example the "
-                                   "python docker library is not compatible with your Windows 10. You can start"
-                                   "the docker manually. (Actually, we prefer you to do that) "
-                                   "Go to the docker_path and open a command line interface:"
-                                   "key in the following command to build you docker image: "
-                                   "docker build -t htm/htm:1.0 ."
-                                   "You will see something like: Successfully built 91bf6cb14f72 near the end"
-                                   "the 91bf6cb14f72 can be different, it is the image id. Keep that id and type"
-                                   "docker run -p 127.0.0.1:8081:8081 -it [91bf6cb14f72]"
-                                   "this will start you docker instance. And you will be inside the docker "
-                                   "environment automatically. Now start the server program inside the docker:"
-                                   "python /home/htmHome/detector_service_provider.py"
-                                   "If you see something like: Running on http://0.0.0.0:8081/ (Press CTRL+C to quit)"
-                                   "You are done, maintain the command line session there, don't close it and "
-                                   "rerun this program, it should work."
-                                   "4. If there is still problem. It seems that you encounter some unknown case."
-                                   "Maybe you can try other detectors which do not need a docker.")
+                raise Exception("Ooops! Something goes wrong which the docker environment! Don't worry"
+                                "This is a step by step instruction for you to make it work."
+                                "1. Make sure docker is installed in your environment correctly. Open a "
+                                "command line tools and type in docker, you should be able to see some response"
+                                "2. Maker sure you pass in a correct docker_path, a Dockerfile should be"
+                                "under docker_path, if you are using relative path, make sure it is correct"
+                                "3. Ok, there may be some trouble with your environment, for example the "
+                                "python docker library is not compatible with your Windows 10. You can start"
+                                "the docker manually. (Actually, we prefer you to do that) "
+                                "Go to the docker_path and open a command line interface:"
+                                "key in the following command to build you docker image: "
+                                "docker build -t htm/htm:1.0 ."
+                                "You will see something like: Successfully built 91bf6cb14f72 near the end"
+                                "the 91bf6cb14f72 can be different, it is the image id. Keep that id and type"
+                                "docker run -p 127.0.0.1:8081:8081 -it [91bf6cb14f72]"
+                                "this will start you docker instance. And you will be inside the docker "
+                                "environment automatically. Now start the server program inside the docker:"
+                                "nohup python /home/htmHome/detector_service_provider.py"
+                                "If you see something like: Running on http://0.0.0.0:8081/ (Press CTRL+C to quit)"
+                                "You are done, maintain the command line session there, don't close it and "
+                                "rerun this program, it should work."
+                                "4. If there is still problem. It seems that you encounter some unknown case."
+                                "Maybe you can try other detectors which do not need a docker.")
 
             self.ip = ip
             self.port = port
             self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
+            if not self.health_check():
+                self.ip = "127.0.0.1"
+                self.port = port
+                self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
+                if not self.health_check():
+                    raise Exception("Ooops! Something goes wrong which the docker environment! Don't worry"
+                                    "This is a step by step instruction for you to make it work."
+                                    "1. Make sure docker is installed in your environment correctly. Open a "
+                                    "command line tools and type in docker, you should be able to see some response"
+                                    "2. Maker sure you pass in a correct docker_path, a Dockerfile should be"
+                                    "under docker_path, if you are using relative path, make sure it is correct"
+                                    "3. Ok, there may be some trouble with your environment, for example the "
+                                    "python docker library is not compatible with your Windows 10. You can start"
+                                    "the docker manually. (Actually, we prefer you to do that) "
+                                    "Go to the docker_path and open a command line interface:"
+                                    "key in the following command to build you docker image: "
+                                    "docker build -t htm/htm:1.0 ."
+                                    "You will see something like: Successfully built 91bf6cb14f72 near the end"
+                                    "the 91bf6cb14f72 can be different, it is the image id. Keep that id and type"
+                                    "docker run -p 127.0.0.1:8081:8081 -it [91bf6cb14f72]"
+                                    "this will start you docker instance. And you will be inside the docker "
+                                    "environment automatically. Now start the server program inside the docker:"
+                                    "nohup python /home/htmHome/detector_service_provider.py"
+                                    "If you see something like: Running on http://0.0.0.0:8081/ (Press CTRL+C to quit)"
+                                    "You are done, maintain the command line session there, don't close it and "
+                                    "rerun this program, it should work."
+                                    "4. If there is still problem. It seems that you encounter some unknown case."
+                                    "Maybe you can try other detectors which do not need a docker.")
 
         else:
-            if docker_ip is not None:
+            if docker_ip is not None or docker_ip == "":
                 print("User didn't provide a docker path, assume the ip address is provided")
                 self.ip = docker_ip
                 self.port = port
                 self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
             else:
-                raise RuntimeError(
+                raise Exception(
                     "Please either provide an docker path for the program to initialize the docker "
                     "environment or set up an accessible docker environment and provide"
                     " an ip address(for example: 127.0.0.1) to the APIs")
@@ -87,7 +116,7 @@ class HTMApiProvider:
         result = self.api_client.call(path="health_check")
         return result == "success"
 
-    def set_max_detector_num(self, num=10):
+    def set_max_detector_num(self, num=100):
         """
         You need to set the maximum detector number supported by the docker server
         The server can only maintain a certain number of detector at the same time

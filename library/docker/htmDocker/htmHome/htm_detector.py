@@ -164,7 +164,7 @@ class HtmDetector:
 
 class DetectorServiceProvider:
 
-    def __init__(self, max_size=10):
+    def __init__(self, max_size=100):
 
         self.max_size = max_size
         self.all_detectors = []
@@ -179,9 +179,9 @@ class DetectorServiceProvider:
         self.all_detectors.append(key)
         self.detectors[key] = htm_detector
         # FIFO protocol to recycle the detectors
-        while len(self.all_detectors) > self.max_size:
-            key_to_delete = self.all_detectors.pop(0)
-            del self.detectors[key_to_delete]
+        # while len(self.all_detectors) > self.max_size:
+        #     key_to_delete = self.all_detectors.pop(0)
+        #     del self.detectors[key_to_delete]
         return key
 
     def recycle_all_detectors(self):

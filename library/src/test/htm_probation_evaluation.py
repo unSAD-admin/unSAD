@@ -57,22 +57,12 @@ def read_data():
 if __name__ == '__main__':
     data = read_data()
     window_size = 50
-    probation_number = 750
-
     threshold = 0.512250003693
+    spatial_tolerance = 0.05
 
-    spatial_tolerance_to_test = [0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.6, 0.8]
-
-<<<<<<< HEAD
-    # spatial_tolerance_to_test = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
-
-    # spatial_tolerance_to_test = [0.007, 0.008, 0.009]
-
-=======
-    spatial_tolerance_to_test = [0.001, 0.002, 0.003]# 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
+    probation_number_to_test = [150, 350, 550, 750, 950, 1150, 1350]
 
     # curl http:127.0.0.1:8081/recycle -> success
->>>>>>> be10170b5c6f141ae8370abc139b236cfeb968b1
     """
     result = 
     {"path":[{"spatial_tolerance":tolerance, "F1 score":F1, "Precision": precision, "Recall": Recall}, ..]
@@ -81,22 +71,12 @@ if __name__ == '__main__':
 
     all_data_keys = list(data.keys())
     all_data_keys.sort()
-<<<<<<< HEAD
-
-    all_data_keys = all_data_keys[0:] #57
-
-
-
-
-    #detector = HTMAnomalyDetector("timestamp", "value")
-=======
 
     all_data_keys = all_data_keys[0:]  # 57
 
     # detector = HTMAnomalyDetector("timestamp", "value")
->>>>>>> be10170b5c6f141ae8370abc139b236cfeb968b1
     result_collector = []
-    for spatial_tolerance in spatial_tolerance_to_test:
+    for probation_number in probation_number_to_test:
         detector = HTMAnomalyDetector("timestamp", "value")
         for key in all_data_keys:
 
@@ -173,11 +153,6 @@ if __name__ == '__main__':
                 "spatial_tolerance": spatial_tolerance, "F": f_score, "precision": precision, "recall": recall
             })
 
-<<<<<<< HEAD
-        
-
-=======
->>>>>>> be10170b5c6f141ae8370abc139b236cfeb968b1
         data_result = []
         for key in result:
             for r in result[key]:
@@ -191,12 +166,9 @@ if __name__ == '__main__':
                     }
                     data_result.append(obj)
 
-        with open("spatial_tolerance_experiment_result.json", "a") as f:
+        with open("probation_experiment_result.json", "a") as f:
             for data_record in data_result:
                 f.write(json.dumps(data_record) + "\n")
 
         print("OK", spatial_tolerance)
-<<<<<<< HEAD
-=======
         #
->>>>>>> be10170b5c6f141ae8370abc139b236cfeb968b1

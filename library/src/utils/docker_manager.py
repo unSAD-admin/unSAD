@@ -39,7 +39,7 @@ def init_docker_environment(path, tag="htm/htm:1.0", timeout=600):
         time.sleep(1)
         timeout -= 1
         if timeout < 0:
-            raise RuntimeError("Docker launch failed!")
+            raise Exception("Docker launch failed!")
 
     ip_address = get_ip_address(query_container_id(client)[0])
     return ip_address
