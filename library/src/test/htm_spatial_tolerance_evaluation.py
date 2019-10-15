@@ -63,8 +63,9 @@ if __name__ == '__main__':
 
     spatial_tolerance_to_test = [0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.6, 0.8]
 
-    spatial_tolerance_to_test = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
+    spatial_tolerance_to_test = [0.001, 0.002, 0.003]# 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
 
+    # curl http:127.0.0.1:8081/recycle -> success
     """
     result = 
     {"path":[{"spatial_tolerance":tolerance, "F1 score":F1, "Precision": precision, "Recall": Recall}, ..]
@@ -74,7 +75,7 @@ if __name__ == '__main__':
     all_data_keys = list(data.keys())
     all_data_keys.sort()
 
-    all_data_keys = all_data_keys[15:]  # 57
+    all_data_keys = all_data_keys[0:]  # 57
 
     # detector = HTMAnomalyDetector("timestamp", "value")
     result_collector = []
@@ -173,3 +174,4 @@ if __name__ == '__main__':
                 f.write(json.dumps(data_record) + "\n")
 
         print("OK", spatial_tolerance)
+        #
