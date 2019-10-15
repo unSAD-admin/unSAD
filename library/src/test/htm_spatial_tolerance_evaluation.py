@@ -65,17 +65,29 @@ if __name__ == '__main__':
 
     spatial_tolerance_to_test = [0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.6, 0.8]
 
+    # spatial_tolerance_to_test = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
+
+    # spatial_tolerance_to_test = [0.007, 0.008, 0.009]
+
     """
     result = 
     {"path":[{"spatial_tolerance":tolerance, "F1 score":F1, "Precision": precision, "Recall": Recall}, ..]
     """
     result = {}
 
+    all_data_keys = list(data.keys())
+    all_data_keys.sort()
 
-    @simple_thread
-    def run_test(spatial_tolerance, result_collector):
+    all_data_keys = all_data_keys[0:] #57
+
+
+
+
+    #detector = HTMAnomalyDetector("timestamp", "value")
+    result_collector = []
+    for spatial_tolerance in spatial_tolerance_to_test:
         detector = HTMAnomalyDetector("timestamp", "value")
-        for key in data:
+        for key in all_data_keys:
 
             if key not in result:
                 result[key] = []
@@ -150,30 +162,23 @@ if __name__ == '__main__':
                 "spatial_tolerance": spatial_tolerance, "F": f_score, "precision": precision, "recall": recall
             })
 
-            result_collector.append(spatial_tolerance)
+        
 
+        data_result = []
+        for key in result:
+            for r in result[key]:
+                if spatial_tolerance == r["spatial_tolerance"]:
+                    obj = {
+                        "file": key,
+                        "spatial_tolerance": r["spatial_tolerance"],
+                        "F": r["F"],
+                        "precision": r["precision"],
+                        "recall": r["recall"]
+                    }
+                    data_result.append(obj)
 
-    #detector = HTMAnomalyDetector("timestamp", "value")
-    result_collector = []
-    for spatial_tolerance in spatial_tolerance_to_test:
-        run_test(spatial_tolerance, result_collector)
+        with open("spatial_tolerance_experiment_result.json", "a") as f:
+            for data_record in data_result:
+                f.write(json.dumps(data_record) + "\n")
 
-    while (len(result_collector) < len(spatial_tolerance_to_test)):
-        time.sleep(60)
-        print(result_collector)
-
-    data_result = []
-    for key in result:
-        for r in result[key]:
-            obj = {
-                "file": key,
-                "spatial_tolerance": r["spatial_tolerance"],
-                "F": r["F"],
-                "precision": r["precision"],
-                "recall": r["recall"]
-            }
-            data_result.append(obj)
-
-    with open("spatial_tolerance_experiment_result.json", "a") as f:
-        for data_record in data_result:
-            f.write(json.dumps(data_record) + "\n")
+        print("OK", spatial_tolerance)
