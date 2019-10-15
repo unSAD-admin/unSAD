@@ -22,6 +22,8 @@ class HTMAnomalyDetector(BaseDetector):
         # Create HTMApiProvider
         self.htm = HTMApiProvider(docker_path)
 
+        self.htm.recycle_detector()
+
         if "max_detector_num" in kwargs:
             self.htm.set_max_detector_num(kwargs[ "max_detector_num"])
 
