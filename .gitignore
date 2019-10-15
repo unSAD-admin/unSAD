@@ -1,3 +1,4 @@
 .idea
 .idea/*
 Data/nasaValve/Data Analysis/allData.json
+*.pyc
