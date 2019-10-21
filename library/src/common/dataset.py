@@ -24,6 +24,13 @@ class SynthDataset(Dataset):
         return x_train, x_test
 
 # Get data from csv
+# filename: str, the path to csv file
+# header: int, the number of header lines, these lines will be skipped, default is 0
+# values: int or tuple, the indexes of columns which contain values
+# timestamp: int or tuple, the indexes of columns which contain timestamp
+# label: int or tuple, the indexes of columns which contain label
+# test_size: float, the proportion of test set size among the whole dataset
+# batch_size: float, the size of each batch
 class CSVDataset(Dataset):
     def __init__(self, filename, header=0, values=None, label=None, timestamp=None, test_size=0.1, batch_size=4096):
         super().__init__()
@@ -45,7 +52,7 @@ class CSVDataset(Dataset):
         else:
             # Get timestamp, values, label respectively
             data = np.loadtxt(self.filename, skiprows=self.header, dtype=str, delimiter=',')
-            return self.splitData(data)
+            return self._splitData(data)
 
 
     def getDataBatch(self):
@@ -61,9 +68,9 @@ class CSVDataset(Dataset):
             data = np.loadtxt(self.filename, skiprows=self.header, dtype=str, delimiter=',',
                               max_rows=self.batch_size)
             self.startrow += data.shape[0]
-            return self.splitData(data)
+            return self._splitData(data)
 
-    def splitData(self, data):
+    def _splitData(self, data):
         t, y = [], []
         if self.timestamp is not None:
             t = data[:, self.timestamp]
