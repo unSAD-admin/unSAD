@@ -39,6 +39,50 @@ class Normalizer(BaseDataProcessor):
             data = data * 2. - 1
         return data
 
+class Standardizer(BaseDataProcessor):
+    def __init__(self, with_mean = True, with_std = True):
+        super().__init__()
+        self.with_mean = with_mean
+        self.with_std = with_std
+
+    def processTrainingData(self, data):
+        if self.with_mean:
+            self.mean = np.mean(data, axis=0)
+        else:
+            self.mean = 0
+
+        if self.with_std:
+            self.std = np.std(data, axis=0)
+        else:
+            self.std = 1
+        self._standardize(data)
+
+    def processTestingData(self, data):
+        self._standardize(data)
+
+    def recoverData(self, data):
+        return data * self.std + self.mean
+
+    def _standardize(self, x):
+        return (x - self.mean) / self.std
+
+class MaxAbsScaler(BaseDataProcessor):
+    def __init__(self):
+        super().__init__()
+
+    def processTrainingData(self, data):
+        amax = np.max(data, axis=0)
+        amin = np.min(data, axis=0)
+        self.max_abs = np.where(-amin > amax, amin, amax)
+        return self._scale(data)
+
+    def processTestingData(self, data):
+        return self._scale(data)
+
+    def _scale(self, x):
+        return x / self.max_abs
+
+
 #TODO(Xingyang Liu) Add more data processors
 
 class TestNormalizer(unittest.TestCase):
