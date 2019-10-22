@@ -22,26 +22,21 @@ class HTMAnomalyDetector(BaseDetector):
         # Create HTMApiProvider
         self.htm = HTMApiProvider(docker_path)
 
-
-
         self.htm.recycle_detector()
 
-
         if "max_detector_num" in kwargs:
-            self.htm.set_max_detector_num(kwargs[ "max_detector_num"])
+            self.htm.set_max_detector_num(kwargs["max_detector_num"])
 
-        # Create new detector with default parameters
+        # Create new detector with default parameters and keep the detector_key
         self.detector_key = self.htm.create_new_detector(lower_data_limit, upper_data_limit, probation_number,
-                                                         spatial_tolerance)  # keep the detector_key
+                                                         spatial_tolerance)
 
     def handle_record(self, record):
         record = self._pre_process_record(record)
-        # should return list [timestamp,value]
         if record is None:
-            raise RuntimeError("Data input does not match the input format")
+            raise Exception("Data input does not match the input format")
 
-        result = self.htm.pass_record_to_detector(self.detector_key, record[0], record[1])  # (key,timestamp,value)
-        return result
+        return self.htm.pass_record_to_detector(self.detector_key, record[0], record[1])
 
     def train(self, training_data):
         # creating lists for timestamp and values and filling them up from training data
@@ -53,9 +48,10 @@ class HTMAnomalyDetector(BaseDetector):
             vs.append(list_element[1])
 
         # pass an array of data to the detector
-        result = self.htm.pass_block_record_to_detector(self.detector_key, ts, vs)
-        #print(result)
-        return result
+        return self.htm.pass_block_record_to_detector(self.detector_key, ts, vs)
+
+    def visualize(self):
+        pass
 
 
 if __name__ == '__main__':
