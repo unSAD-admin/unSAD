@@ -1,3 +1,10 @@
+# Follow the following step to build image and start the service
+# start you docker d
+# docker build -t htm/htm:1.0 .
+# docker run -p 127.0.0.1:8081:8081 -it [image id]
+# nohup python /home/htmHome/detector_service_provider.py
+
+
 FROM ubuntu:latest
 
 RUN echo "Building a docker image!"
@@ -19,6 +26,4 @@ RUN pip2 install Flask
 COPY /htmHome/* /home/htmHome/
 
 EXPOSE 8081:8081
-
-#RUN python /home/htmHome/detector_service_provider.py
 
