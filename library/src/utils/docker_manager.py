@@ -7,13 +7,13 @@ from utils.annotations import simple_thread
 
 
 @simple_thread
-def build_image(path, tag):
+def build_image(path, tag, port):
     client = docker.from_env()
     image = client.images.build(path=path, tag=tag)[0]
 
     # start the docker server
     client.containers.run(image, "python /home/htmHome/detector_service_provider.py",
-                          ports={"8081/tcp": ('127.0.0.1', 8081)})
+                          ports={"{port}/tcp".format(port=port): ('127.0.0.1', port)})
 
     # the session will maintain
 
@@ -30,11 +30,11 @@ def query_container_id(client):
     return result
 
 
-def init_docker_environment(path, tag="htm/htm:1.0", timeout=600):
+def init_docker_environment(path, tag="htm/htm:1.0", port=8081, timeout=600):
     client = docker.from_env()
     if len(query_container_id(client)) != 0:
         return get_ip_address(query_container_id(client)[0])
-    build_image(path, tag)
+    build_image(path, tag, port)
     while len(query_container_id(client)) == 0:
         time.sleep(1)
         timeout -= 1

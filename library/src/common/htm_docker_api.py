@@ -2,6 +2,7 @@
 
 import sys
 import json
+import logging
 
 sys.path.append("../")
 from common.http_api_client import HttpApiClient
@@ -12,105 +13,51 @@ Due to some reason, the docker may not be able to start itself on some environme
 You can just use the following commands to start it manually from the Dockerfile directory
 
 docker build -t htm/htm:1.0 .
--> get image id  91bf6cb14f72, [you will see a line: Successfully built 91bf6cb14f72]
-docker run -p 127.0.0.1:8081:8081 -it 91bf6cb14f72
+-> get image id [image id], you will see a line: Successfully built [image id]
+docker run -p 127.0.0.1:8081:8081 -it [image id],
 python /home/htmHome/detector_service_provider.py
 
 """
 
 
 class HTMApiProvider:
+    """
+    This class is the Api provider used by HTM detector
+    """
 
-    def __init__(self, docker_path, docker_ip=None, port=8081, tag="htm/htm:1.0"):
-        """
-        There should be only one Api Provider running on one port, please maintain a single instance
-        For this class
-        :param port: Should be the port exposed by the docker server
-        :param docker_path: Should be the path to the fold which contains the Dockerfile
-        :param tag: the tag you would like to assign to the docker image
-        """
-        if docker_path is not None:
-            ip = None
-            try:
-                ip = init_docker_environment(docker_path, tag=tag)
-                #ip = "127.0.0.1"
-                print("Got ip address:", ip, "from python docker API")
-            except Exception:
-                ip = "127.0.0.1"
-                self.ip = ip
-                self.port = port
-                self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
-                print("Testing whether the docker is set up")
-                if not self.health_check():
-                    ip = None
-            if ip is None:
-                raise Exception("Ooops! Something goes wrong which the docker environment! Don't worry"
-                                "This is a step by step instruction for you to make it work."
-                                "1. Make sure docker is installed in your environment correctly. Open a "
-                                "command line tools and type in docker, you should be able to see some response"
-                                "2. Maker sure you pass in a correct docker_path, a Dockerfile should be"
-                                "under docker_path, if you are using relative path, make sure it is correct"
-                                "3. Ok, there may be some trouble with your environment, for example the "
-                                "python docker library is not compatible with your Windows 10. You can start"
-                                "the docker manually. (Actually, we prefer you to do that) "
-                                "Go to the docker_path and open a command line interface:"
-                                "key in the following command to build you docker image: "
-                                "docker build -t htm/htm:1.0 ."
-                                "You will see something like: Successfully built 91bf6cb14f72 near the end"
-                                "the 91bf6cb14f72 can be different, it is the image id. Keep that id and type"
-                                "docker run -p 127.0.0.1:8081:8081 -it [91bf6cb14f72]"
-                                "this will start you docker instance. And you will be inside the docker "
-                                "environment automatically. Now start the server program inside the docker:"
-                                "nohup python /home/htmHome/detector_service_provider.py"
-                                "If you see something like: Running on http://0.0.0.0:8081/ (Press CTRL+C to quit)"
-                                "You are done, maintain the command line session there, don't close it and "
-                                "rerun this program, it should work."
-                                "4. If there is still problem. It seems that you encounter some unknown case."
-                                "Maybe you can try other detectors which do not need a docker.")
+    def __init__(self, docker_path=None, docker_ip=None, port=8081, tag="htm/htm:1.0"):
 
-            self.ip = ip
+        if docker_ip is not None:
+            self.ip = docker_ip
             self.port = port
             self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
             if not self.health_check():
-                self.ip = "127.0.0.1"
+                logging.warning("The provided ip address:" + docker_ip + " is not accessible")
+                self.ip = None
+                self.port = None
+                self.api_client = None
+            else:
+                return
+        elif docker_path is not None:
+            try:
+                self.ip = init_docker_environment(docker_path, tag=tag)
                 self.port = port
                 self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
                 if not self.health_check():
-                    raise Exception("Ooops! Something goes wrong which the docker environment! Don't worry"
-                                    "This is a step by step instruction for you to make it work."
-                                    "1. Make sure docker is installed in your environment correctly. Open a "
-                                    "command line tools and type in docker, you should be able to see some response"
-                                    "2. Maker sure you pass in a correct docker_path, a Dockerfile should be"
-                                    "under docker_path, if you are using relative path, make sure it is correct"
-                                    "3. Ok, there may be some trouble with your environment, for example the "
-                                    "python docker library is not compatible with your Windows 10. You can start"
-                                    "the docker manually. (Actually, we prefer you to do that) "
-                                    "Go to the docker_path and open a command line interface:"
-                                    "key in the following command to build you docker image: "
-                                    "docker build -t htm/htm:1.0 ."
-                                    "You will see something like: Successfully built 91bf6cb14f72 near the end"
-                                    "the 91bf6cb14f72 can be different, it is the image id. Keep that id and type"
-                                    "docker run -p 127.0.0.1:8081:8081 -it [91bf6cb14f72]"
-                                    "this will start you docker instance. And you will be inside the docker "
-                                    "environment automatically. Now start the server program inside the docker:"
-                                    "nohup python /home/htmHome/detector_service_provider.py"
-                                    "If you see something like: Running on http://0.0.0.0:8081/ (Press CTRL+C to quit)"
-                                    "You are done, maintain the command line session there, don't close it and "
-                                    "rerun this program, it should work."
-                                    "4. If there is still problem. It seems that you encounter some unknown case."
-                                    "Maybe you can try other detectors which do not need a docker.")
+                    logging.warning("The provided docker path:" + docker_path + " is not usable")
+                else:
+                    return
+            except Exception as e:
+                logging.warning(
+                    "Can't create docker environment from the provided docker path: {path}, Exception: {error}".format(
+                        path=docker_path, error=e))
 
-        else:
-            if docker_ip is not None or docker_ip == "":
-                print("User didn't provide a docker path, assume the ip address is provided")
-                self.ip = docker_ip
-                self.port = port
-                self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
-            else:
-                raise Exception(
-                    "Please either provide an docker path for the program to initialize the docker "
-                    "environment or set up an accessible docker environment and provide"
-                    " an ip address(for example: 127.0.0.1) to the APIs")
+        # if the above doesn't work, try to access 127.0.0.1
+        self.ip = "127.0.0.1"
+        self.port = port
+        self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
+        if not self.health_check():
+            raise Exception("No suitable docker environment is provided")
 
     def health_check(self):
         result = self.api_client.call(path="health_check")
@@ -159,7 +106,7 @@ class HTMApiProvider:
 
     def pass_block_record_to_detector(self, key, timestamps, values):
         """
-        In order to reduce the number of http request to make it more efficient
+        In order to reduce the number of http rmmmmequest to make it more efficient
         This method is provided to pass a block of data to the server at one run
         the timestamps and values are two array of data.
         """
@@ -187,44 +134,3 @@ class HTMApiProvider:
             return True
         else:
             return False
-
-
-"""
-The following code are example about how to use this htm docker api to train
-"""
-
-import time
-
-if __name__ == '__main__':
-    htm = HTMApiProvider(docker_path="../../docker/htmDocker/")
-    # Test basic API
-    print(htm.recycle_detector())
-    print(htm.set_max_detector_num(10))
-
-    # create new detector with default parameters
-    detector_key = htm.create_new_detector()  # keep the detector_key
-
-    print(detector_key)
-    result = []
-    now = time.time()
-    for i in range(4):
-        # pass the data record to the detector
-        result.append(htm.pass_record_to_detector(detector_key, i + 1, 0.12 + i * 2))
-    t = time.time() - now
-    print(result)
-    print(t)
-
-    ts = []
-    vs = []
-    for i in range(4, 400):
-        ts.append(i + 1)
-        vs.append(0.12 + i * 2)
-    now = time.time()
-    # pass an array of data to the detector
-    result = htm.pass_block_record_to_detector(detector_key, ts, vs)
-    t = time.time() - now
-
-    for r in result:
-        print(r)
-    print(result)
-    print(t)
