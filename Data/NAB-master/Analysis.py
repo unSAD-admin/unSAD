@@ -84,7 +84,7 @@ def toCSVFormat(data):
     for key in data:
         with open(os.path.join(dir_path, key), 'w') as f:
             for record in data[key]:
-                label = 0;
+                label = 0
                 if key in labelinfo and record[0] in labelinfo[key]:
                     label = 1
                 f.write("%f,%f,%d\n"%(record[0], record[1], label))
