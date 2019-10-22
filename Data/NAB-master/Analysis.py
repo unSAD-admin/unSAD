@@ -79,7 +79,7 @@ def toTableauFormat(data):
 def toCSVFormat(data):
     labelinfo = readLabel()
     dir_path = "./csv/"
-    if os.path.isdir(dir_path):
+    if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
     for key in data:
         with open(os.path.join(dir_path, key), 'w') as f:
