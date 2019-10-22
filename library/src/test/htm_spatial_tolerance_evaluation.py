@@ -166,7 +166,6 @@ if __name__ == '__main__':
                 "spatial_tolerance": spatial_tolerance, "F": f_score, "precision": precision, "recall": recall
             })
 
-
     data_result = []
     for key in result:
         for r in result[key]:
