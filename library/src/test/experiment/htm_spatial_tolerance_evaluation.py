@@ -5,7 +5,7 @@ import datetime
 import json
 import time
 
-sys.path.append("../")
+sys.path.append("../../")
 from utils.annotations import simple_thread
 from detectors.htm.htm_detector import HTMAnomalyDetector
 
@@ -18,7 +18,7 @@ def to_timestamp(timestr):
 
 
 def read_data():
-    file_path = "../../data/NAB_data/labels/combined_windows.json"
+    file_path = "../../../data/NAB_data/labels/combined_windows.json"
     with open(file_path) as f:
         content = f.read()
         obj = json.loads(content)
@@ -30,7 +30,7 @@ def read_data():
 
     data = {}
     for key in result:
-        path = "../../data/NAB_data/data/" + key
+        path = "../../../data/NAB_data/data/" + key
         data[key] = []
         with open(path) as f:
             content = f.read().split("\n")[1:-1]
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 if max_value < data_value[i]["value"]:
                     max_value = data_value[i]["value"]
 
-            detector.initialize("../../docker/htmDocker", probation_number=probation_number, lower_data_limit=min_value,
+            detector.initialize("../../../docker/htmDocker", probation_number=probation_number, lower_data_limit=min_value,
                                 upper_data_limit=max_value, spatial_tolerance=spatial_tolerance, max_detector_num=200)
 
             training_data = []

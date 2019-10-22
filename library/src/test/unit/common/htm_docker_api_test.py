@@ -1,14 +1,13 @@
 # Created by Xinyu Zhu on 10/21/2019, 10:23 PM
 
 import sys
-import logging
 import time
 
-sys.path.append("../../")
+sys.path.append("../../../")
 from common.htm_docker_api import HTMApiProvider
 
 if __name__ == '__main__':
-    htm = HTMApiProvider(docker_path="../../../docker/htmDocker/")
+    htm = HTMApiProvider(docker_path="../../../../docker/htmDocker/")
     # Test basic API
     print(htm.recycle_detector())
     print(htm.set_max_detector_num(10))

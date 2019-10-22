@@ -2,7 +2,7 @@
 
 import sys
 
-sys.path.append("../")
+sys.path.append("../../../")
 
 from collections import defaultdict
 
@@ -33,10 +33,10 @@ def readFile(filename):
 
 if __name__ == '__main__':
 
-    data = {"training1": readFile("../../data/login_trace/login.trace_9809181415.int"),
-            "training2": readFile("../../data/login_trace/login.trace_9809251022.int"),
-            "testing": readFile("../../data/login_trace/login-homegrown.int"),
-            "recover": readFile("../../data/login_trace/login-recovered.int")}
+    data = {"training1": readFile("../../../../data/login_trace/login.trace_9809181415.int"),
+            "training2": readFile("../../../../data/login_trace/login.trace_9809251022.int"),
+            "testing": readFile("../../../../data/login_trace/login-homegrown.int"),
+            "recover": readFile("../../../../data/login_trace/login-recovered.int")}
 
     trainingids = list(data["training1"].keys())
     testingids = list(data["testing"].keys())
