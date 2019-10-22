@@ -71,14 +71,15 @@ class CSVDataset(Dataset):
             return self._splitData(data)
 
     def _splitData(self, data):
-        t, y = [], []
+        t_train, t_test, y_train, y_test = [], [], [], []
         if self.timestamp is not None:
             t = data[:, self.timestamp]
+            t_train, t_test = train_test_split(t, test_size=self.test_size, shuffle=False)
         x = data[:, self.values].astype(np.float32)
+        x_train, x_test = train_test_split(x, test_size=self.test_size, shuffle=False)
         if self.label is not None:
             y = data[:, self.label]
-        t_train, t_test, x_train, x_test, y_train, y_test = train_test_split(
-            t, x, y, test_size=self.test_size, shuffle=False)
+            y_train, y_test = train_test_split(y, test_size=self.test_size, shuffle=False)
         return {"timestamp": t_train, "values": x_train, "label": y_train}, \
                {"timestamp": t_test, "values": x_test, "label": y_test}
 
