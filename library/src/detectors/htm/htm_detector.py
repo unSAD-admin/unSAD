@@ -15,7 +15,7 @@ class HTMAnomalyDetector(BaseDetector):
         super(HTMAnomalyDetector, self).__init__(timestamp_col_name=timestamp_col_name,
                                                  measure_col_names=[value_col_name], symbolic=False)
 
-    def initialize(self, docker_path, lower_data_limit=-1e9, upper_data_limit=1e9, probation_number=750,
+    def initialize(self, docker_path=None, lower_data_limit=-1e9, upper_data_limit=1e9, probation_number=750,
                    spatial_tolerance=0.05, *args, **kwargs):
         super(HTMAnomalyDetector, self).initialize(*args, **kwargs)
 

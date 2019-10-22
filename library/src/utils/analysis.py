@@ -6,7 +6,6 @@ default_style = 'seaborn-whitegrid'
 
 def draw_array(sequence):
     """Visualize a 1D numerical sequence"""
-    assert isinstance(sequence, list)
     plt.style.use(default_style)
     x = range(len(sequence))
     plt.plot(x, sequence)
@@ -15,7 +14,5 @@ def draw_array(sequence):
 
 def draw_xy(sequence_x, sequence_y):
     """Visualize a line with the given x, y list"""
-    assert isinstance(sequence_x, list)
-    assert isinstance(sequence_y, list)
     plt.style.use(default_style)
     plt.plot(sequence_x, sequence_y)
