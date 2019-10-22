@@ -11,6 +11,20 @@ from utils.collection_tools import normalize
 
 
 class SequentialPatternAnomalyDetector(BaseDetector):
+    """
+    This detector is designed for detecting low frequency patterns in symbolic sequence
+    The detector is based on pattern based prediction, given the first n symbols, the detector
+    will predict a list of possible next symbol as well as a probability distribution over
+    them based on previous observation. An anomaly score will be given after the detector
+    receive the next symbol.
+
+    There are two hyper-parameters for this model:
+    window_size (int): how many previous symbol will the detector used at most to predict the next symbol
+    reduce_factor (float): The prediction is based on a weighted schema, if both of the following patterns
+    are presented : (a,b) -> c, (b) -> d. The longer pattern (first one) will be assign more weight when
+    doing prediction according to the reduce_factor, if reduce_factor == 2, the weight will be 2 times
+    larger.
+    """
 
     def __init__(self, measure_col_names=None):
         super(SequentialPatternAnomalyDetector, self).__init__(timestamp_col_name=None,

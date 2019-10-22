@@ -55,7 +55,7 @@ class RelativeEntropyDetector(BaseDetector):
             super(RelativeEntropyDetector, self).__init__(timestamp_col_name=None,
                                                           measure_col_names=["value"], symbolic=False)
 
-    def initialize(self, input_min, input_max, *args, **kwargs):
+    def initialize(self, input_min, input_max, n_nins=5, window_size=52, *args, **kwargs):
         """A fact about this detector is that is requires the knowledge of the min_value and max_value"""
         super(RelativeEntropyDetector, self).initialize(args, kwargs)
         self.input_min = input_min
@@ -66,10 +66,10 @@ class RelativeEntropyDetector(BaseDetector):
         self.util = []
 
         # Number of bins into which util is to be quantized
-        self.n_bins = 5
+        self.n_bins = n_nins
 
         # Window size
-        self.W = 52
+        self.W = window_size
 
         # Threshold against which the test statistic is compared. It is set to
         # the point in the chi-squared cdf with N-bins -1 degrees of freedom that
@@ -137,7 +137,7 @@ class RelativeEntropyDetector(BaseDetector):
                     self.c.append(1)
                     self.m = 1
                 else:
-                    index = self.getAgreementHypothesis(p_hat)
+                    index = self.get_agreement_hypothesis(p_hat)
 
                     # Check if any null hypothesis is accepted or rejected
                     if index != -1:
@@ -161,7 +161,7 @@ class RelativeEntropyDetector(BaseDetector):
 
         return anomaly_score
 
-    def getAgreementHypothesis(self, P_hat):
+    def get_agreement_hypothesis(self, P_hat):
         """This function computes multinomial goodness-of-fit test. It calculates
         the relative entropy test statistic between P_hat and all `m` null
         hypothesis and compares it against the threshold `T` based on cdf of

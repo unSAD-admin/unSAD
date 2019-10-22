@@ -2,6 +2,10 @@
 
 
 def normalize(collection):
+    """
+    Normalize the value of all element in a collection
+    each element will be divided by the sum
+    """
     if isinstance(collection, dict):
         total = 0
         result = {}
@@ -22,8 +26,11 @@ def normalize(collection):
     return result
 
 
-# a very low efficiency filter function
 def simple_filter(array, filter_func, window_size):
+    """
+    apply 1D convolution operation on array using filter_func as the
+    activation function and window_size for window size
+    """
     result = []
     for i in range(window_size - 1):
         result.append(array[i])
@@ -33,4 +40,9 @@ def simple_filter(array, filter_func, window_size):
 
 
 def mean_filter(array):
-    return sum(array)/len(array)
+    """
+    a mean filter function
+    :param array: the input array
+    :return: the mean of the array
+    """
+    return sum(array) / len(array)
