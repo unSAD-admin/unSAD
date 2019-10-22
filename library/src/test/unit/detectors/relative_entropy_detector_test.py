@@ -1,7 +1,6 @@
 # Created by Xinyu Zhu on 10/7/2019, 12:53 AM
 import sys
 import unittest
-import datetime
 
 from analysis import draw_array
 
@@ -11,7 +10,7 @@ from detectors.relative_entropy_detector import RelativeEntropyDetector
 from common.dataset import CSVDataset
 
 
-class TestHTMDetector(unittest.TestCase):
+class TestRelativeEntropyDetector(unittest.TestCase):
 
     def test_detector(self):
 

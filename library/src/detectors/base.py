@@ -115,7 +115,15 @@ class BaseDetector:
                 raise UnSADException.not_proper_initialize_exception()
 
         if not self.symbolic:
-            return [float(result[i]) for i in range(len(result))]
+            try:
+                processed_result = [float(result[i]) for i in range(len(result))]
+            except RuntimeError as e:
+                logging.error("This detector is for numerical data, make sure"
+                              " the input can be converted to numerical data")
+                raise UnSADException.data_type_exception()
+
+            return processed_result[0] if len(processed_result) == 1 else processed_result
+
         else:
             if self.timestamp is not None:
                 return [result[0], symbolic_split.join([str(s) for s in result[1:]])]

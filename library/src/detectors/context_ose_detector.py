@@ -34,6 +34,6 @@ class ContextOSEDetector(BaseDetector):
     def handle_record(self, input_data):
         # input_data = self._pre_process_record(input_data)
         input_data = self._pre_process_record(input_data)
-        input_data = {"value": input_data[0]}
+        input_data = {"value": input_data}
         anomaly_score = self.cadose.getAnomalyScore(input_data)
         return anomaly_score
