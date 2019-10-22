@@ -104,7 +104,7 @@ class RelativeEntropyDetector(BaseDetector):
         """
         input_data = self._pre_process_record(input_data)
         anomaly_score = 0.0
-        self.util.append(input_data[0])
+        self.util.append(input_data)
 
         #  This check is for files where self.inputMin == self.input max i.e
         #  all data points are identical and stepSize is 0 e.g
