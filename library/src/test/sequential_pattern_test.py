@@ -7,7 +7,7 @@ sys.path.append("../")
 from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
-from utils.analysis import drawArray
+from utils.analysis import draw_array
 from utils.collection_tools import simple_filter, mean_filter
 
 
@@ -17,28 +17,26 @@ def readFile(filename):
         content = f.read()
         content = content.split("\n")
         for line in content:
-            if line != None and line != "":
+            if line is not None and line != "":
                 cline = line.split(' ')
                 result[cline[0]].append(cline[1])
 
-    newResult = {}
+    new_result = {}
     for key in result:
         if len(result[key]) == 1:
             continue
         else:
-            newResult[key] = result[key]
+            new_result[key] = result[key]
 
-    return newResult
+    return new_result
 
 
 if __name__ == '__main__':
 
-    data = {}
-
-    data["training1"] = readFile("../../data/login_trace/login.trace_9809181415.int")
-    data["training2"] = readFile("../../data/login_trace/login.trace_9809251022.int")
-    data["testing"] = readFile("../../data/login_trace/login-homegrown.int")
-    data["recover"] = readFile("../../data/login_trace/login-recovered.int")
+    data = {"training1": readFile("../../data/login_trace/login.trace_9809181415.int"),
+            "training2": readFile("../../data/login_trace/login.trace_9809251022.int"),
+            "testing": readFile("../../data/login_trace/login-homegrown.int"),
+            "recover": readFile("../../data/login_trace/login-recovered.int")}
 
     trainingids = list(data["training1"].keys())
     testingids = list(data["testing"].keys())
@@ -72,5 +70,5 @@ if __name__ == '__main__':
 
     result = simple_filter(result, mean_filter, window_size)
     # print(result)
-    drawArray(result)
+    draw_array(result)
     # detector.handle_record_sequence()

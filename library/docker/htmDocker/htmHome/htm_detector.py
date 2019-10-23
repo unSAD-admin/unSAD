@@ -43,13 +43,13 @@ class HtmDetector:
 
     def __init__(self):
         self.model = None
-        self.sensorParams = None
-        self.anomalyLikelihood = None
+        # self.sensorParams = None
+        self.anomaly_likelihood = None
         # Keep track of value range for spatial anomaly detection
 
-        self.minVal = None
+        self.min_val = None
 
-        self.maxVal = None
+        self.max_val = None
 
         # Set this to False if you want to get results based on raw scores
         # without using AnomalyLikelihood. This will give worse results, but
@@ -57,52 +57,53 @@ class HtmDetector:
         # to re-optimize the thresholds when running with this setting.
         self.useLikelihood = True
 
-    def handle_record(self, inputData):
-        """Returns a tuple (anomalyScore, rawScore).
+    def handle_record(self, input_data):
+        """Returns a tuple (anomalyScore, raw_score).
 
     Internally to NuPIC "anomalyScore" corresponds to "likelihood_score"
-    and "rawScore" corresponds to "anomaly_score". Sorry about that.
+    and "raw_score" corresponds to "anomaly_score". Sorry about that.
 
-    inputData should be in this format:
+    input_data should be in this format:
     {"timestamp": datetime.fromtimestamp(timestamp), "value": value}
     timestamp must be a datatime object
     value must be a float value
     """
         # Send it to Numenta detector and get back the results
-        result = self.model.run(inputData)
+
+        result = self.model.run(input_data)
 
         # Get the value
-        value = inputData["value"]
+        value = input_data["value"]
 
         # Retrieve the anomaly score and write it to a file
-        rawScore = result.inferences["anomalyScore"]
+        raw_score = result.inferences["anomalyScore"]
 
         # Update min/max values and check if there is a spatial anomaly
-        spatialAnomaly = False
-        if self.minVal != self.maxVal:
-            tolerance = (self.maxVal - self.minVal) * self.spatial_tolerance
-            maxExpected = self.maxVal + tolerance
-            minExpected = self.minVal - tolerance
-            if value > maxExpected or value < minExpected:
-                spatialAnomaly = True
-        if self.maxVal is None or value > self.maxVal:
-            self.maxVal = value
-        if self.minVal is None or value < self.minVal:
-            self.minVal = value
+        spatial_anomaly = False
+        if self.min_val != self.max_val:
+            tolerance = (self.max_val - self.min_val) * self.spatial_tolerance
+            max_expected = self.max_val + tolerance
+            min_expected = self.min_val - tolerance
+            if value > max_expected or value < min_expected:
+                spatial_anomaly = True
+        if self.max_val is None or value > self.max_val:
+            self.max_val = value
+        if self.min_val is None or value < self.min_val:
+            self.min_val = value
 
         if self.useLikelihood:
             # Compute log(anomaly likelihood)
-            anomalyScore = self.anomalyLikelihood.anomalyProbability(
-                inputData["value"], rawScore, inputData["timestamp"])
-            logScore = self.anomalyLikelihood.computeLogLikelihood(anomalyScore)
-            finalScore = logScore
+            anomaly_score = self.anomaly_likelihood.anomalyProbability(
+                input_data["value"], raw_score, input_data["timestamp"])
+            log_score = self.anomaly_likelihood.computeLogLikelihood(anomaly_score)
+            final_score = log_score
         else:
-            finalScore = rawScore
+            final_score = raw_score
 
-        if spatialAnomaly:
-            finalScore = 1.0
+        if spatial_anomaly:
+            final_score = 1.0
 
-        return (finalScore, rawScore)
+        return (final_score, raw_score)
 
     def initialize(self, lower_data_limit=-1e9, upper_data_limit=1e9, probation_number=750, spatial_tolerance=0.05):
         """
@@ -112,9 +113,9 @@ class HtmDetector:
             the algorithm will treat the first probation_number input as a reference to calculate likelihood
             It is expect that no anomaly should be in the first probation_number sample, the longer the better
         """
-        self.probationaryPeriod = probation_number
-        self.inputMin = lower_data_limit
-        self.inputMax = upper_data_limit
+        self.probationary_period = probation_number
+        self.input_min = lower_data_limit
+        self.input_max = upper_data_limit
 
         # Fraction outside of the range of values seen so far that will be considered
         # a spatial anomaly regardless of the anomaly likelihood calculation. This
@@ -123,28 +124,27 @@ class HtmDetector:
         self.spatial_tolerance = spatial_tolerance
 
         # Get config params, setting the RDSE resolution
-        rangePadding = abs(self.inputMax - self.inputMin) * 0.2
-        modelParams = getScalarMetricWithTimeOfDayAnomalyParams(
+        range_padding = abs(self.input_max - self.input_min) * 0.2
+        model_params = getScalarMetricWithTimeOfDayAnomalyParams(
             metricData=[0],
-            minVal=self.inputMin - rangePadding,
-            maxVal=self.inputMax + rangePadding,
+            minVal=self.input_min - range_padding,
+            maxVal=self.input_max + range_padding,
             minResolution=0.001,
             tmImplementation="cpp"
         )["modelConfig"]
 
         self._setupEncoderParams(
-            modelParams["modelParams"]["sensorParams"]["encoders"])
+            model_params["modelParams"]["sensorParams"]["encoders"])
 
-        self.model = ModelFactory.create(modelParams)
-
+        self.model = ModelFactory.create(model_params)
         self.model.enableInference({"predictedField": "value"})
 
         if self.useLikelihood:
             # Initialize the anomaly likelihood object
-            numentaLearningPeriod = int(math.floor(self.probationaryPeriod / 2.0))
-            self.anomalyLikelihood = anomaly_likelihood.AnomalyLikelihood(
-                learningPeriod=numentaLearningPeriod,
-                estimationSamples=self.probationaryPeriod - numentaLearningPeriod,
+            numenta_learning_period = int(math.floor(self.probationary_period / 2.0))
+            self.anomaly_likelihood = anomaly_likelihood.AnomalyLikelihood(
+                learningPeriod=numenta_learning_period,
+                estimationSamples=self.probationary_period - numenta_learning_period,
                 reestimationPeriod=100
             )
 
@@ -164,7 +164,7 @@ class HtmDetector:
 
 class DetectorServiceProvider:
 
-    def __init__(self, max_size=10):
+    def __init__(self, max_size=100):
 
         self.max_size = max_size
         self.all_detectors = []
@@ -179,9 +179,9 @@ class DetectorServiceProvider:
         self.all_detectors.append(key)
         self.detectors[key] = htm_detector
         # FIFO protocol to recycle the detectors
-        while len(self.all_detectors) > self.max_size:
-            key_to_delete = self.detectors.pop(0)
-            del self.detectors[key_to_delete]
+        # while len(self.all_detectors) > self.max_size:
+        #     key_to_delete = self.all_detectors.pop(0)
+        #     del self.detectors[key_to_delete]
         return key
 
     def recycle_all_detectors(self):

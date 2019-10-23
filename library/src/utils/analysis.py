@@ -2,9 +2,11 @@
 import matplotlib.pyplot as plt
 
 
-def drawArray(sequence):
+def draw_array(sequence):
     assert isinstance(sequence, list)
     plt.style.use('seaborn-whitegrid')
     x = range(len(sequence))
     plt.plot(x, sequence)
     plt.show()
+
+

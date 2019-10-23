@@ -22,6 +22,15 @@ class HTMAnomalyDetector(BaseDetector):
         # Create HTMApiProvider
         self.htm = HTMApiProvider(docker_path)
 
+<<<<<<< HEAD
+        self.htm.recycle_detector()
+=======
+        # self.htm.recycle_detector();
+>>>>>>> be10170b5c6f141ae8370abc139b236cfeb968b1
+
+        if "max_detector_num" in kwargs:
+            self.htm.set_max_detector_num(kwargs[ "max_detector_num"])
+
         # Create new detector with default parameters
         self.detector_key = self.htm.create_new_detector(lower_data_limit, upper_data_limit, probation_number,
                                                          spatial_tolerance)  # keep the detector_key
@@ -33,7 +42,6 @@ class HTMAnomalyDetector(BaseDetector):
             raise RuntimeError("Data input does not match the input format")
 
         result = self.htm.pass_record_to_detector(self.detector_key, record[0], record[1])  # (key,timestamp,value)
-        print(result)
         return result
 
     def train(self, training_data):
@@ -47,7 +55,7 @@ class HTMAnomalyDetector(BaseDetector):
 
         # pass an array of data to the detector
         result = self.htm.pass_block_record_to_detector(self.detector_key, ts, vs)
-        print(result)
+        #print(result)
         return result
 
 
@@ -62,4 +70,5 @@ if __name__ == '__main__':
     # testing train()
     print("Testing train()")
     for i in range(5):
-        htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
+        result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
+        print(result)

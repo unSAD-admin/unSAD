@@ -12,7 +12,8 @@ RUN apt-get install --assume-yes python-pip
 
 RUN echo "Installing python2 libraries"
 
-RUN pip2 install nupic Flask
+RUN pip2 install nupic
+RUN pip2 install Flask
 
 
 COPY /htmHome/* /home/htmHome/
