@@ -28,7 +28,7 @@ import sys
 from scipy import stats
 
 sys.path.append("../")
-from base import BaseDetector
+from detectors.base import BaseDetector
 
 
 class RelativeEntropyDetector(BaseDetector):

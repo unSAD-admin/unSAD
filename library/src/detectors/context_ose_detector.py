@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../")
 from common.context_ose.cad_ose import ContextualAnomalyDetectorOSE
-from base import BaseDetector
+from detectors.base import BaseDetector
 
 
 class ContextOSEDetector(BaseDetector):
