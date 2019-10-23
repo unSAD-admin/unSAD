@@ -26,3 +26,8 @@ class UnSADException(Exception):
     @staticmethod
     def data_format_exception():
         return UnSADException("Wrong Data format")
+
+    @staticmethod
+    def docker_exception():
+        return UnSADException("Failed to initialize or find a required docker environment")
+

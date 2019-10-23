@@ -6,6 +6,7 @@ import logging
 
 sys.path.append("../")
 from common.http_api_client import HttpApiClient
+from common.unsad_exceptions import UnSADException
 from utils.docker_manager import init_docker_environment
 
 """
@@ -57,7 +58,8 @@ class HTMApiProvider:
         self.port = port
         self.api_client = HttpApiClient(ip_address=self.ip, port=self.port)
         if not self.health_check():
-            raise Exception("No suitable docker environment is provided")
+            # raise exception if can't find any usable docker environment
+            raise UnSADException.docker_exception()
 
     def health_check(self):
         result = self.api_client.call(path="health_check")
@@ -106,7 +108,7 @@ class HTMApiProvider:
 
     def pass_block_record_to_detector(self, key, timestamps, values):
         """
-        In order to reduce the number of http rmmmmequest to make it more efficient
+        In order to reduce the number of http request to make it more efficient
         This method is provided to pass a block of data to the server at one run
         the timestamps and values are two array of data.
         """
