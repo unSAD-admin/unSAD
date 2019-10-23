@@ -65,11 +65,11 @@ def main():
     for filename in file_list:
         if args.dataset == "synth":
             dataset = SynthDataset()
-            x_train, x_test = dataset.getData()
+            x_train, x_test = dataset.get_data()
         elif args.dataset == 'yahoo':
             dataset = CSVDataset(filename, header = 1, values = 1, label = 2,
                     timestamp = 0, test_size=args.test_size)
-            data_train, data_test = dataset.getData()
+            data_train, data_test = dataset.get_data()
             x_train, y_train = data_train["values"], data_train["label"]
             x_test, y_test = data_test["values"], data_test["label"]
             y_train = y_train.astype(int)
@@ -77,7 +77,7 @@ def main():
         elif args.dataset == 'nab':
             dataset = CSVDataset(filename, timestamp=0, values=1, label=2,
                     test_size=args.test_size)
-            data_train, data_test = dataset.getData()
+            data_train, data_test = dataset.get_data()
             x_train, y_train = data_train["values"], data_train["label"]
             x_test, y_test = data_test["values"], data_test["label"]
             y_train = y_train.astype(int)
