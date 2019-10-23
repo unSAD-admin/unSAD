@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 import random
 import torch
+import warnings
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
@@ -33,6 +34,8 @@ parser.add_argument('--window_size',
         help='percentage of data to ignore in calculating the loss', default=45)
 parser.add_argument('--seq2seq', help='use sequence to sequence model',
         action='store_true')
+parser.add_argument('--early_stop_epoches', type=int, default=500,
+        help='number of epoches applied for early_stop, set to a big number to disable early stop')
 parser.add_argument('--verbose', help='use to print loss', action='store_true')
 parser.add_argument('--save_dir', type=str, default='results',
     help='directory to save file')
@@ -45,6 +48,8 @@ def anomaly_score(a, b):
     return np.abs(a-b)
 
 def main():
+    if args.seq2seq:
+        warnings.warn("Be cautious when using seq2seq model, it seems to perform badly")
     # reproducibility
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -111,7 +116,7 @@ def main():
 
         # train the model
         model.train(x_train_torch.view((1, -1, output_size)),
-                num_epoches=args.epoches, verbose=args.verbose)
+                num_epoches=args.epoches, verbose=args.verbose, early_stop_epoches=args.early_stop_epoches)
 
         # put the whole sequence in pred
         if args.validate:

@@ -30,21 +30,24 @@ class LSTMPredAnomalyDetector(BaseDetector):
             self.model.cuda()
 
     # train the data for num_epoches epoches
-    def train(self, x_train, num_epoches=300, verbose=False):
+    def train(self, x_train, num_epoches=300, verbose=False, early_stop_epoches=5):
         # train the model
         # TODO: add non-seq2seq training
         if self.use_gpu:
             x_train = x_train.cuda()
         print("--------training--------")
         if self.seq2seq:
-            self.train_seq2seq(x_train, num_epoches, verbose=verbose)
+            self.train_seq2seq(x_train, num_epoches, verbose=verbose,
+                    early_stop_epoches=early_stop_epoches)
         else:
-            self.train_nonseq2seq(x_train, num_epoches, verbose=verbose)
+            self.train_nonseq2seq(x_train, num_epoches, verbose=verbose,
+                    early_stop_epoches=early_stop_epoches)
 
-    def train_seq2seq(self, x_train, num_epoches=300, verbose=False):
+    def train_seq2seq(self, x_train, num_epoches=300, verbose=False, early_stop_epoches=5):
         learning_rate = 1e-3
         optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
+        min_loss, min_epoch = 1e10, 0
         for i in range(num_epoches):
             # Zero out gradient,
             optimiser.zero_grad()
@@ -54,11 +57,16 @@ class LSTMPredAnomalyDetector(BaseDetector):
             # Backward pass
             if verbose:
                 print("loss:\t", loss.item())
+            if loss.item() < min_loss:
+                min_loss, min_epoch = loss.item(), i
             loss.backward()
             # Update parameters
             optimiser.step()
+            if i - min_epoch >= early_stop_epoches:
+                print("stop at epoch: ", i, "/", num_epoches)
+                break;
 
-    def train_nonseq2seq(self, x_train, num_epoches=300, batch_size=160, verbose=False):
+    def train_nonseq2seq(self, x_train, num_epoches=300, batch_size=160, verbose=False, early_stop_epoches=5):
         # make sure it's one sequence
         learning_rate = 1e-3
         assert(x_train.shape[0]==1)
@@ -71,8 +79,11 @@ class LSTMPredAnomalyDetector(BaseDetector):
         optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
         # NOTE: set batch size as sequence size
+        min_loss, min_epoch = 1e10, 0
         for i in range(num_epoches):
-            for ite in range(len(x_train)//batch_size):
+            sum_loss = 0.
+            num_batches = len(x_train)//batch_size
+            for ite in range(num_batches):
                 # sample index
                 # Zero out gradient,
                 optimiser.zero_grad()
@@ -90,12 +101,19 @@ class LSTMPredAnomalyDetector(BaseDetector):
 
                 y_pred = self.model(x_data)
                 loss = loss_fn(y_pred, y_test)
-                if verbose:
-                    print("loss:\t", loss.item())
+                sum_loss += loss.item()
                 # Backward pass
                 loss.backward()
                 # Update parameters
                 optimiser.step()
+            mean_loss = sum_loss / num_batches
+            if verbose:
+                print("loss:\t", mean_loss)
+            if mean_loss < min_loss:
+                min_loss, min_epoch = mean_loss, i
+            if i - min_epoch >= early_stop_epoches:
+                print("stop at epoch: ", i, "/", num_epoches)
+                break;
 
     def predict(self, x_new, start=None):
         print("--------prediction--------")
