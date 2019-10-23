@@ -48,21 +48,3 @@ class HTMAnomalyDetector(BaseDetector):
 
         # pass an array of data to the detector
         return self.htm.pass_block_record_to_detector(self.detector_key, ts, vs)
-
-    def visualize(self):
-        pass
-
-
-if __name__ == '__main__':
-    htm = HTMAnomalyDetector("timestamp", "value")
-    htm.initialize(docker_path="../../../docker/htmDocker/")
-    # testing handle_record
-    print("Testing handle_record()")
-    for i in range(5):
-        htm.handle_record([2 + i, 6 * i + 3])
-
-    # testing train()
-    print("Testing train()")
-    for i in range(5):
-        result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
-        print(result)
