@@ -1,16 +1,14 @@
-import sys
 import os
-import json
-import datetime
 import csv
-import time
 
-def writecsv(file,filename):
+
+def writecsv(file, filename):
     csvfile = open(filename, 'w')
-    writer = csv.writer(csvfile,lineterminator='\n')
+    writer = csv.writer(csvfile, lineterminator='\n')
     for line in file:
         writer.writerow(line)
     csvfile.close()
+
 
 def expriment_window(path):
     files = {}
@@ -26,7 +24,7 @@ def expriment_window(path):
             with open(filepath, newline='') as f:
                 reader = csv.reader(f)
                 for idx, row in enumerate(reader):
-                    #ts, value, label, anomaly, res_label
+                    # ts, value, label, anomaly, res_label
                     data.append(row)
             for window_size in range(10, 200, 10):
                 tot_window = 0
@@ -47,29 +45,29 @@ def expriment_window(path):
                     if window_label == window_res:
                         if window_label == 1:
                             TP += 1
-                        else :
+                        else:
                             TN += 1
                     else:
                         if window_res == 0:
                             FN += 1
                         else:
                             FP += 1
-                
+
                 precision = 0
                 recall = 0
                 if TP + FP != 0:
                     precision = TP / (TP + FP)
                 if TP + FN != 0:
                     recall = TP / (TP + FN)
-                f1 = 0 
+                f1 = 0
                 if precision + recall != 0:
-                    f1 = 2 * precision * recall / ( precision + recall )
-                print ('---------', filename, f1, precision, recall, '--------')
+                    f1 = 2 * precision * recall / (precision + recall)
+                print('---------', filename, f1, precision, recall, '--------')
                 if filename not in files:
                     files[filename] = []
                 files[filename].append(f1)
-    
-           #output.append([filename, f1, precision, recall])
+
+        # output.append([filename, f1, precision, recall])
     output = []
     for filename in files:
         cur = [filename]
@@ -94,9 +92,9 @@ def cal_window_f1(path, window_size=50):
             with open(filepath, newline='') as f:
                 reader = csv.reader(f)
                 for idx, row in enumerate(reader):
-                    #ts, value, label, anomaly, res_label
+                    # ts, value, label, anomaly, res_label
                     data.append(row)
-            
+
             tot_window = 0
             TP = 0
             TN = 0
@@ -115,28 +113,29 @@ def cal_window_f1(path, window_size=50):
                 if window_label == window_res:
                     if window_label == 1:
                         TP += 1
-                    else :
+                    else:
                         TN += 1
                 else:
                     if window_res == 0:
                         FN += 1
                     else:
                         FP += 1
-            
+
             precision = 0
             recall = 0
             if TP + FP != 0:
                 precision = TP / (TP + FP)
             if TP + FN != 0:
                 recall = TP / (TP + FN)
-            f1 = 0 
+            f1 = 0
             if precision + recall != 0:
-                f1 = 2 * precision * recall / ( precision + recall )
-            print ('---------', filename, f1, precision, recall, '--------')
+                f1 = 2 * precision * recall / (precision + recall)
+            print('---------', filename, f1, precision, recall, '--------')
             files[filename] = [f1, precision, recall]
             output.append([filename, f1, precision, recall])
     writecsv(output, 'window_evaluation.csv')
-if __name__ == '__main__':
-    #cal_window_f1('2019-10-10_00:09:18_res')
-    expriment_window('2019-10-10_00-09-18_res')
 
+
+if __name__ == '__main__':
+    # cal_window_f1('2019-10-10_00:09:18_res')
+    expriment_window('2019-10-10_00-09-18_res')
