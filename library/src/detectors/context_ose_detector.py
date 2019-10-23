@@ -1,10 +1,11 @@
 # Created by Xinyu Zhu on 10/6/2019, 11:51 PM
-from base import BaseDetector
+
 
 import sys
 
 sys.path.append("../")
 from common.context_ose.cad_ose import ContextualAnomalyDetectorOSE
+from base import BaseDetector
 
 
 class ContextOSEDetector(BaseDetector):

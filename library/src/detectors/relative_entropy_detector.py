@@ -23,9 +23,11 @@
 
 import math
 import numpy
+import sys
 
 from scipy import stats
 
+sys.path.append("../")
 from base import BaseDetector
 
 
