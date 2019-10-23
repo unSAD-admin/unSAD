@@ -1,10 +1,11 @@
 # Created by Xinyu Zhu on 10/6/2019, 11:51 PM
-from base import BaseDetector
+
 
 import sys
 
 sys.path.append("../")
 from common.context_ose.cad_ose import ContextualAnomalyDetectorOSE
+from detectors.base import BaseDetector
 
 
 class ContextOSEDetector(BaseDetector):
@@ -34,6 +35,6 @@ class ContextOSEDetector(BaseDetector):
     def handle_record(self, input_data):
         # input_data = self._pre_process_record(input_data)
         input_data = self._pre_process_record(input_data)
-        input_data = {"value": input_data[0]}
+        input_data = {"value": input_data}
         anomaly_score = self.cadose.getAnomalyScore(input_data)
         return anomaly_score

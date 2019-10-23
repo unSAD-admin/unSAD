@@ -23,10 +23,12 @@
 
 import math
 import numpy
+import sys
 
 from scipy import stats
 
-from base import BaseDetector
+sys.path.append("../")
+from detectors.base import BaseDetector
 
 
 class RelativeEntropyDetector(BaseDetector):
@@ -104,7 +106,7 @@ class RelativeEntropyDetector(BaseDetector):
         """
         input_data = self._pre_process_record(input_data)
         anomaly_score = 0.0
-        self.util.append(input_data[0])
+        self.util.append(input_data)
 
         #  This check is for files where self.inputMin == self.input max i.e
         #  all data points are identical and stepSize is 0 e.g

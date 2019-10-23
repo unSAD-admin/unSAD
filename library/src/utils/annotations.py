@@ -32,24 +32,3 @@ def simple_thread(func):
         t.start()
 
     return simple_thread_wrapper
-
-
-######################################### Below are testing #############################################
-
-
-@profiling
-def profilingTest(a):
-    time.sleep(a)
-    return 1 + a
-
-
-@profiling
-@simple_thread
-def argmentTest(*args, **kwargs):
-    print(args)
-    print(kwargs)
-
-
-if __name__ == '__main__':
-    argmentTest("1", "2", key="as")
-    print(isinstance(None, str))
