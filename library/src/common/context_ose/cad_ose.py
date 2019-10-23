@@ -1,8 +1,8 @@
 # Created by Xinyu Zhu on 10/6/2019, 11:53 PM
 import sys
 
-sys.path.append("../")
-from context_ose.context_operator import ContextOperator
+sys.path.append("../../")
+from common.context_ose.context_operator import ContextOperator
 
 
 class ContextualAnomalyDetectorOSE(object):
