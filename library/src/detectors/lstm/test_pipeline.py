@@ -91,8 +91,8 @@ def main():
         # plt.legend()
         # plt.show()
         normalizer = Normalizer(zero_mean=True)
-        x_train_norm = normalizer.processTrainingData(x_train)
-        x_test_norm = normalizer.processTestingData(x_test)
+        x_train_norm = normalizer.process_training_data(x_train)
+        x_test_norm = normalizer.process_testing_data(x_test)
         # train, val split
         if args.validate:
             x_train_norm, x_val_norm, y_train, y_val = train_test_split(x_train_norm, y_train,
@@ -146,7 +146,7 @@ def main():
             # except NameError:
             #     pass
             # de-normalize
-            x_pred = normalizer.recoverData(x_pred_norm)
+            x_pred = normalizer.recover_data(x_pred_norm)
             # visualization
             model.visualize(np.concatenate((x_train, x_test), 0),
                     x_pred, test_score, np.concatenate((y_train, y_test), 0), len(x_train))
