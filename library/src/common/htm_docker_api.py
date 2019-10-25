@@ -122,7 +122,7 @@ class HTMApiProvider:
         The server can only maintain a certain number of detector at the same time
         to serve different client. Each detector has its own memory and should be used by
         one anomaly detection task. The default number is 10. If more detectors are created
-        than the maximum number, old detectors will be recycled.
+        than the maximum number, old detectors will be recycled..
         """
         result = self.api_client.call(path="set_max", params=[num])
         if result == "success":
