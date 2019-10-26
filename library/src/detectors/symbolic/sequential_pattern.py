@@ -82,8 +82,6 @@ class SequentialPatternAnomalyDetector(BaseDetector):
 
     def handle_record(self, record):
         record = self._pre_process_record(record)
-        if record is None:
-            raise RuntimeError("Data input does not match the input format")
         next_candidate = self._predict()
         result = 0
         if record in next_candidate:
