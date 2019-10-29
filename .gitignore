@@ -5,3 +5,5 @@ Data/nasaValve/Data Analysis/allData.json
 .DS_Store
 *DS_Store
 *__pycache__*
+data/*
+data

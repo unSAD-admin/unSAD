@@ -3,10 +3,8 @@
 import sys
 import datetime
 import json
-import time
 
 sys.path.append("../../")
-from utils.annotations import simple_thread
 from detectors.relative_entropy_detector import RelativeEntropyDetector
 
 
