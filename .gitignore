@@ -7,3 +7,6 @@ Data/nasaValve/Data Analysis/allData.json
 *__pycache__*
 data/*
 data
+*.json
+*.csv
+*.gz
