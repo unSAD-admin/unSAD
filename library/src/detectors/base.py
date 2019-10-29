@@ -150,7 +150,7 @@ class BaseDetector:
     def process_training_data(self, data, processors):
         res = data.copy()
         for processor in processors:
-            res = processor.processTrainingData(res)
+            res = processor.process_training_data(res)
         return res
 
     def train(self, training_data):

@@ -5,9 +5,9 @@ from torch.autograd import Variable
 import numpy as np
 import unittest
 
-# window size: 25, 35, 45
-class ADCNN(nn.Module):
-    def __init__(self, window_size, output_size = 1):
+
+class ADCNN(nn.Module):  # window size: 25, 35, 45
+    def __init__(self, window_size, output_size=1):
         super().__init__()
         #  conv(relu)-maxpool-conv(relu)-maxpool-fc-1
         #  in_channels, out_channels, kernel_size
@@ -18,16 +18,16 @@ class ADCNN(nn.Module):
         self.conv2 = nn.Conv1d(32, 32, 3, padding=1)
         # self.bn2 = nn.BatchNorm2d(32)
         self.maxpool2 = nn.MaxPool1d(2)
-        self.fc = nn.Linear(window_size//4*32, output_size)
+        self.fc = nn.Linear(window_size // 4 * 32, output_size)
         self.initialize()
 
     def forward(self, x):
         x = x.new(x.shape[0], x.shape[2], x.shape[1])
         x = self.conv1(x)
         # x = self.bn1(x)
-        x =  F.relu(x)
+        x = F.relu(x)
         x = self.maxpool1(x)
-        x =  self.conv2(x)
+        x = self.conv2(x)
         # x = self.bn2(x)
         x = F.relu(x)
         x = self.maxpool2(x)
@@ -35,7 +35,7 @@ class ADCNN(nn.Module):
         x = self.fc(x)
         # Sigmoid to avoid explode
         # x = 2 *  torch.sigmoid(x) - 1
-        x  = torch.clamp(x, -1, 1)
+        x = torch.clamp(x, -1, 1)
         return x
 
     def initialize(self):
@@ -45,9 +45,11 @@ class ADCNN(nn.Module):
             elif 'weight' in name and param.dim() > 1:
                 nn.init.xavier_normal_(param)
 
-# reference: https://github.com/jessicayung/blog-code-snippets/blob/master/lstm-pytorch/lstm-baseline.py
+
 class ADLSTM(nn.Module):
-    def __init__(self, output_size = 1, seq2seq=True):
+    # reference:
+    # https://github.com/jessicayung/blog-code-snippets/blob/master/lstm-pytorch/lstm-baseline.py
+    def __init__(self, output_size=1, seq2seq=True):
         super().__init__()
         # sequence 2 sequence
         self.seq2seq = seq2seq
@@ -92,7 +94,6 @@ class ADLSTM(nn.Module):
                 nn.init.xavier_normal_(param)
 
 
-
 class TestCNNDims(unittest.TestCase):
     def test_dims(self):
         batch_size = 11
@@ -102,31 +103,36 @@ class TestCNNDims(unittest.TestCase):
                 # 3d input
                 x = np.ones([batch_size, window_size, 1], dtype=np.float32)
                 x = torch.FloatTensor(torch.from_numpy(x))
-                y =  adcnn(x)
-                self.assertEqual(y.shape, torch.Size([batch_size, output_size]))
+                y = adcnn(x)
+                self.assertEqual(y.shape, torch.Size(
+                    [batch_size, output_size]))
+
 
 class TestLSTMDims(unittest.TestCase):
     def test_dims(self):
         batch_size = 11
         for window_size in [25, 35, 45]:
             for output_size in [1, 10, 100]:
-                adlstm = ADLSTM(output_size, seq2seq = False)
+                adlstm = ADLSTM(output_size, seq2seq=False)
                 # 3d input
                 x = np.ones([batch_size, window_size, 1], dtype=np.float32)
                 x = torch.FloatTensor(torch.from_numpy(x))
-                y =  adlstm(x)
-                self.assertEqual(y.shape, torch.Size([batch_size, output_size]))
+                y = adlstm(x)
+                self.assertEqual(y.shape, torch.Size(
+                    [batch_size, output_size]))
+
     def test_dims_seq2seq(self):
         batch_size = 11
         for window_size in [25, 35, 45]:
             for output_size in [1, 10, 100]:
-                adlstm = ADLSTM(output_size, seq2seq = True)
+                adlstm = ADLSTM(output_size, seq2seq=True)
                 # 3d input
                 x = np.ones([batch_size, window_size, 1], dtype=np.float32)
                 x = torch.FloatTensor(torch.from_numpy(x))
-                y =  adlstm(x)
-                self.assertEqual(y.shape, torch.Size([batch_size, window_size, output_size]))
+                y = adlstm(x)
+                self.assertEqual(y.shape, torch.Size(
+                    [batch_size, window_size, output_size]))
 
 
-if __name__ ==  "__main__":
+if __name__ == "__main__":
     unittest.main()

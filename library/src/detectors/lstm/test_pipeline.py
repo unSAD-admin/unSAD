@@ -1,4 +1,7 @@
 
+from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
+from common.dataset import SynthDataset, CSVDataset
+from utils.data_processor import Normalizer
 import glob
 import argparse
 import numpy as np
@@ -9,40 +12,65 @@ from sklearn.metrics import confusion_matrix
 
 import sys
 sys.path.append("../../")
-from utils.data_processor import Normalizer
-from common.dataset import SynthDataset, CSVDataset
-from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
 
 parser = argparse.ArgumentParser(
-        description='Train and Test anomaly detection algorithm')
-parser.add_argument('--seed', type=int, default=1234,
-        help = 'seed for numpy and torch to maintain reproducibility')
-parser.add_argument('--dataset', type=str, default='synth',
-        choices=['synth','yahoo', 'nab'], help='type of dataset to use')
+    description='Train and Test anomaly detection algorithm')
+parser.add_argument(
+    '--seed',
+    type=int,
+    default=1234,
+    help='seed for numpy and torch to maintain reproducibility')
+parser.add_argument(
+    '--dataset',
+    type=str,
+    default='synth',
+    choices=[
+        'synth',
+        'yahoo',
+        'nab'],
+    help='type of dataset to use')
 parser.add_argument('--file_prefix', type=str, default='',
-        help='filepath for the data file')
-parser.add_argument('--model', type=str, default='lstm', choices=['lstm','cnn'])
+                    help='filepath for the data file')
+parser.add_argument(
+    '--model',
+    type=str,
+    default='lstm',
+    choices=[
+        'lstm',
+        'cnn'])
 parser.add_argument('--epoches', type=int, default=300)
 parser.add_argument('--thresh', type=float, default=0.25)
-parser.add_argument('--validate', help='Test on Validation set', action='store_true')
-parser.add_argument('--no_gpu', help='Test on Validation set', action='store_false')
+parser.add_argument(
+    '--validate',
+    help='Test on Validation set',
+    action='store_true')
+parser.add_argument(
+    '--no_gpu',
+    help='Test on Validation set',
+    action='store_false')
 parser.add_argument('--test_size', help='test data percentage', default=0.4)
-parser.add_argument('--val_size',
-        help='validation data percentage in total training data', default=0.1)
-parser.add_argument('--window_size',
-        help='percentage of data to ignore in calculating the loss', default=45)
+parser.add_argument(
+    '--val_size',
+    help='validation data percentage in total training data',
+    default=0.1)
+parser.add_argument(
+    '--window_size',
+    help='percentage of data to ignore in calculating the loss',
+    default=45)
 parser.add_argument('--seq2seq', help='use sequence to sequence model',
-        action='store_true')
+                    action='store_true')
 parser.add_argument('--verbose', help='use to print loss', action='store_true')
 parser.add_argument('--save_dir', type=str, default='results',
-    help='directory to save file')
+                    help='directory to save file')
 args = parser.parse_args()
 if args.model == 'cnn' and args.seq2seq:
     args.seq2seq = False
     print("WARNING: cnn must be non-seq2seq")
 
+
 def anomaly_score(a, b):
-    return np.abs(a-b)
+    return np.abs(a - b)
+
 
 def main():
     # reproducibility
@@ -59,7 +87,7 @@ def main():
         # This is a hack, only one data file
         file_list = [""]
     elif args.dataset == 'yahoo' or args.dataset == 'nab':
-        file_list = glob.glob(args.file_prefix+"*")
+        file_list = glob.glob(args.file_prefix + "*")
     else:
         raise ValueError("dataset %s not recognized" % args.dataset)
     for filename in file_list:
@@ -67,8 +95,8 @@ def main():
             dataset = SynthDataset()
             x_train, x_test = dataset.get_data()
         elif args.dataset == 'yahoo':
-            dataset = CSVDataset(filename, header = 1, values = 1, label = 2,
-                    timestamp = 0, test_size=args.test_size)
+            dataset = CSVDataset(filename, header=1, values=1, label=2,
+                                 timestamp=0, test_size=args.test_size)
             data_train, data_test = dataset.get_data()
             x_train, y_train = data_train["values"], data_train["label"]
             x_test, y_test = data_test["values"], data_test["label"]
@@ -76,7 +104,7 @@ def main():
             y_test = y_test.astype(int)
         elif args.dataset == 'nab':
             dataset = CSVDataset(filename, timestamp=0, values=1, label=2,
-                    test_size=args.test_size)
+                                 test_size=args.test_size)
             data_train, data_test = dataset.get_data()
             x_train, y_train = data_train["values"], data_train["label"]
             x_test, y_test = data_test["values"], data_test["label"]
@@ -91,12 +119,12 @@ def main():
         # plt.legend()
         # plt.show()
         normalizer = Normalizer(zero_mean=True)
-        x_train_norm = normalizer.processTrainingData(x_train)
-        x_test_norm = normalizer.processTestingData(x_test)
+        x_train_norm = normalizer.process_training_data(x_train)
+        x_test_norm = normalizer.process_testing_data(x_test)
         # train, val split
         if args.validate:
-            x_train_norm, x_val_norm, y_train, y_val = train_test_split(x_train_norm, y_train,
-                test_size=args.val_size, shuffle=False)
+            x_train_norm, x_val_norm, y_train, y_val = train_test_split(
+                x_train_norm, y_train, test_size=args.val_size, shuffle=False)
             x_val_torch = torch.from_numpy(x_val_norm)
         # convert to torch tensor
         x_train_torch = torch.from_numpy(x_train_norm)
@@ -104,14 +132,18 @@ def main():
         output_size = 1
         if args.model in ['lstm', 'cnn']:
             model = LSTMPredAnomalyDetector()
-            model.initialize(output_size, seq2seq = args.seq2seq,
-                    use_gpu=args.no_gpu, window_size=args.window_size, model=args.model)
+            model.initialize(
+                output_size,
+                seq2seq=args.seq2seq,
+                use_gpu=args.no_gpu,
+                window_size=args.window_size,
+                model=args.model)
         else:
             raise ValueError("model %s not recognized" % args.model)
 
         # train the model
         model.train(x_train_torch.view((1, -1, output_size)),
-                num_epoches=args.epoches, verbose=args.verbose)
+                    num_epoches=args.epoches, verbose=args.verbose)
 
         # put the whole sequence in pred
         if args.validate:
@@ -119,15 +151,17 @@ def main():
         else:
             x_total = torch.cat((x_train_torch, x_test_torch), 0)
         # predict
-        x_pred_norm = model.predict(x_total.view((1, -1, output_size)), start=x_train_torch.shape[0])
-        x_pred_norm = x_pred_norm[0, : ,0]
+        x_pred_norm = model.predict(x_total.view(
+            (1, -1, output_size)), start=x_train_torch.shape[0])
+        x_pred_norm = x_pred_norm[0, :, 0]
         # convert to numpy
         x_pred_norm = x_pred_norm.numpy()
         # calculate score
-        test_score = anomaly_score(x_pred_norm[-len(x_test_torch):], x_test_norm)
+        test_score = anomaly_score(
+            x_pred_norm[-len(x_test_torch):], x_test_norm)
         if args.validate:
-            val_score = anomaly_score(
-                x_pred_norm[len(x_train_torch):len(x_train_torch)+len(x_val_torch)], x_val_norm)
+            val_score = anomaly_score(x_pred_norm[len(x_train_torch):len(
+                x_train_torch) + len(x_val_torch)], x_val_norm)
             test_score = anomaly_score(
                 x_pred_norm[-len(x_test_torch):], x_test_norm)
             # conf_mat = confusion_matrix((score > args.thresh).astype(int),
@@ -146,10 +180,12 @@ def main():
             # except NameError:
             #     pass
             # de-normalize
-            x_pred = normalizer.recoverData(x_pred_norm)
+            x_pred = normalizer.recover_data(x_pred_norm)
             # visualization
-            model.visualize(np.concatenate((x_train, x_test), 0),
-                    x_pred, test_score, np.concatenate((y_train, y_test), 0), len(x_train))
+            model.visualize(
+                np.concatenate(
+                    (x_train, x_test), 0), x_pred, test_score, np.concatenate(
+                    (y_train, y_test), 0), len(x_train))
     # rate_list = []
     # for i in range(4):
     #     rate = sum([a[i] for a in conf_mat_list])
