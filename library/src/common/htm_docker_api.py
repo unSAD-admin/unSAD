@@ -62,7 +62,10 @@ class HTMApiProvider:
             raise UnSADException.docker_exception()
 
     def health_check(self):
-        result = self.api_client.call(path="health_check")
+        try:
+            result = self.api_client.call(path="health_check")
+        except:
+            return False
         return result == "success"
 
     def set_max_detector_num(self, num=100):
