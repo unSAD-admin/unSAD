@@ -1,11 +1,11 @@
-from model import ADLSTM, ADCNN
-from detectors.base import BaseDetector
 import sys
 import random
 import torch
 import torch.optim as optim
 
 sys.path.append("../../")
+from model import ADLSTM, ADCNN
+from detectors.base import BaseDetector
 
 
 class LSTMPredAnomalyDetector(BaseDetector):
