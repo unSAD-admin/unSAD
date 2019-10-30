@@ -1,13 +1,14 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # Created by Xinyu Zhu on 10/3/2019, 1:33 AM
 
 import sys
 
-sys.path.append("../../")
-
+sys.path.append('../../')
 from detectors.base import BaseDetector
-from collections import defaultdict
-
 from utils.collection_tools import normalize
+
+from collections import defaultdict
 
 
 class SequentialPatternAnomalyDetector(BaseDetector):
@@ -27,23 +28,37 @@ class SequentialPatternAnomalyDetector(BaseDetector):
     """
 
     def __init__(self, measure_col_names=None):
-        super(SequentialPatternAnomalyDetector, self).__init__(timestamp_col_name=None,
-                                                               measure_col_names=measure_col_names, symbolic=True)
+        super(SequentialPatternAnomalyDetector,
+              self).__init__(timestamp_col_name=None,
+                             measure_col_names=measure_col_names,
+                             symbolic=True)
 
-    def initialize(self, window_size=60, reduce_factor=2, *args, **kwargs):
-        super(SequentialPatternAnomalyDetector, self).initialize(*args, **kwargs)
+    def initialize(
+            self,
+            window_size=60,
+            reduce_factor=2,
+            *args,
+            **kwargs
+    ):
+
+        super(SequentialPatternAnomalyDetector, self).initialize(*args,
+                                                                 **kwargs)
 
         # the window size: the detector use prefix patterns with length <= window size to predict next symbol
+
         self.window_size = window_size
 
         # for pattern rule counting, ("a","b","c") -> 2 means given the current prefix "a","b", there are 2 times that
         # the next symbol is "c"
+
         self.counter = {}
 
         # with the length of the prefix decrease by 1, the weight decrease by a factor
+
         self.reduce_factor = reduce_factor
 
         # data structure used to keep previous symbols
+
         self.buffer = []
 
     def _count_subsequence(self, input):
@@ -54,6 +69,7 @@ class SequentialPatternAnomalyDetector(BaseDetector):
          "b","c" -> "d"  --> (b","c","d") += 1 -->  ("b","c") -> {"d":1}
          "c" -> "d"  --> ("c","d") += 1 -->  ("c") -> {"d":1}
         """
+
         for i in range(len(input) - 2, -1, -1):
             if len(input) - i > self.window_size + 1:
                 break
@@ -75,7 +91,8 @@ class SequentialPatternAnomalyDetector(BaseDetector):
                 break
             else:
                 for key in self.counter[base_tuple]:
-                    result[key] += self.counter[base_tuple][key] * current_weight
+                    result[key] += self.counter[base_tuple][key] \
+                                   * current_weight
                 current_weight *= self.reduce_factor
 
         return normalize(result)

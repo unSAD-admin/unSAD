@@ -29,8 +29,10 @@ class BaseDetector:
         timestamp_col_name: the column name for timestamp
         measure_col_names: the list of column name that need to be considered by detector
         """
-        assert timestamp_col_name is None or isinstance(timestamp_col_name, str)
-        assert measure_col_names is None or (isinstance(measure_col_names, list) and len(measure_col_names) > 0)
+        assert timestamp_col_name is None or isinstance(
+            timestamp_col_name, str)
+        assert measure_col_names is None or (isinstance(
+            measure_col_names, list) and len(measure_col_names) > 0)
         assert isinstance(symbolic, bool)
         self.timestamp = timestamp_col_name
         self.measure = measure_col_names
@@ -54,13 +56,15 @@ class BaseDetector:
         symbolic_split = ","
         if isinstance(data, dict):
             if self.measure is None:
-                logging.error("Didn't tell the detector the name of the key pointing to the value to detect")
+                logging.error(
+                    "Didn't tell the detector the name of the key pointing to the value to detect")
                 raise UnSADException.data_format_exception()
             if self.timestamp is not None:
                 if self.timestamp in data:
                     try:
                         result.append(float(data[self.timestamp]))
-                        [result.append(data[measure]) for measure in self.measure]
+                        [result.append(data[measure])
+                         for measure in self.measure]
                     except RuntimeError:
                         logging.error("The input data type is invalid, please make sure "
                                       "the timestamp is a numerical type")
@@ -116,7 +120,8 @@ class BaseDetector:
 
         if not self.symbolic:
             try:
-                processed_result = [float(result[i]) for i in range(len(result))]
+                processed_result = [float(result[i])
+                                    for i in range(len(result))]
             except RuntimeError as e:
                 logging.error("This detector is for numerical data, make sure"
                               " the input can be converted to numerical data")
