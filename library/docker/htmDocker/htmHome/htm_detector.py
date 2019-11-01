@@ -88,6 +88,10 @@ class HtmDetector:
         if self.min_val is None or value < self.min_val:
             self.min_val = value
 
+        if spatial_anomaly:
+            final_score = 1.0
+            return (final_score, raw_score)
+
         if self.useLikelihood:
             # Compute log(anomaly likelihood)
             anomaly_score = self.anomaly_likelihood.anomalyProbability(
@@ -96,9 +100,6 @@ class HtmDetector:
             final_score = log_score
         else:
             final_score = raw_score
-
-        if spatial_anomaly:
-            final_score = 1.0
 
         return (final_score, raw_score)
 
