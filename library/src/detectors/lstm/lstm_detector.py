@@ -31,6 +31,8 @@ class LSTMPredAnomalyDetector(BaseDetector):
         self.use_gpu = use_gpu and torch.cuda.is_available()
         self.seq2seq = seq2seq
 
+        super(LSTMPredAnomalyDetector, self).initialize()
+
         # init model
         if model == 'lstm':
             self.model = ADLSTM(output_size, seq2seq=self.seq2seq)
@@ -42,6 +44,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
             self.model.cuda()
 
     # train the data for num_epoches epoches
+    @BaseDetector.require_initialize
     def train(self, x_train, num_epoches=300, verbose=False):
         # train the model
         # TODO: add non-seq2seq training
@@ -53,6 +56,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
         else:
             self.train_nonseq2seq(x_train, num_epoches, verbose=verbose)
 
+    @BaseDetector.require_initialize
     def train_seq2seq(self, x_train, num_epoches=300, verbose=False):
         learning_rate = 1e-3
         optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
@@ -71,6 +75,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
             # Update parameters
             optimiser.step()
 
+    @BaseDetector.require_initialize
     def train_nonseq2seq(
             self,
             x_train,
@@ -115,6 +120,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
                 # Update parameters
                 optimiser.step()
 
+    @BaseDetector.require_initialize
     def predict(self, x_new, start=None):
         print("--------prediction--------")
         if self.use_gpu:
@@ -127,11 +133,13 @@ class LSTMPredAnomalyDetector(BaseDetector):
             x_pred = x_pred.cpu()
         return x_pred
 
+    @BaseDetector.require_initialize
     def predict_seq2seq(self, x_new):
         with torch.no_grad():
             x_pred = self.model(x_new)
         return x_pred
 
+    @BaseDetector.require_initialize
     def predict_nonseq2seq(self, x_new, start=None):
         # seq2seq
         assert(x_new.shape[0] == 1)

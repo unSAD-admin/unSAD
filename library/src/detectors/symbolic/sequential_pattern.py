@@ -97,6 +97,7 @@ class SequentialPatternAnomalyDetector(BaseDetector):
 
         return normalize(result)
 
+    @BaseDetector.require_initialize
     def handle_record(self, record):
         record = self._pre_process_record(record)
         next_candidate = self._predict()
@@ -109,6 +110,7 @@ class SequentialPatternAnomalyDetector(BaseDetector):
         self._count_subsequence(self.buffer)
         return result
 
+    @BaseDetector.require_initialize
     def train(self, training_data):
         for record in training_data:
             self.handle_record(record)

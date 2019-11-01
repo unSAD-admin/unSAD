@@ -94,6 +94,7 @@ class RelativeEntropyDetector(BaseDetector):
         # List where c[i] tracks the number of windows that agree with P[i]
         self.c = []
 
+    @BaseDetector.require_initialize
     def handle_record(self, input_data):
         """ Returns a list of [anomalyScore] that takes a binary value of 0 or 1.
         The anomalyScore is determined based on the agreement of the observed data

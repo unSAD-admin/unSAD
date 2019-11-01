@@ -52,13 +52,15 @@ class HTMAnomalyDetector(BaseDetector):
                                          probation_number,
                                          spatial_tolerance)
 
+    @BaseDetector.require_initialize
     def handle_record(self, record):
         record = self._pre_process_record(record)
         return self.htm.pass_record_to_detector(self.detector_key,
                                                 record[0], record[1])
 
-    def train(self, training_data):
 
+    @BaseDetector.require_initialize
+    def train(self, training_data):
         ts = []
         vs = []
         for list_element in training_data:

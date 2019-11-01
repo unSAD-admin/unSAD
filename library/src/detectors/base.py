@@ -38,6 +38,8 @@ class BaseDetector:
         self.measure = measure_col_names
         self.symbolic = symbolic
 
+        self.initialized = False
+
     def _check_parameter(self, data):
         """
         Check whether an input data record has correct data format
@@ -135,6 +137,15 @@ class BaseDetector:
             else:
                 return symbolic_split.join([str(s) for s in result])
 
+    def require_initialize(func):
+        def check_initialize(self, *args, **kwargs):
+            if not self.initialized:
+                raise UnSADException.not_proper_initialize_exception()
+            else:
+                return func(self, *args, **kwargs)
+
+        return check_initialize
+
     def get_data_format(self):
         """
         Return the data record format that is accepted by this detector
@@ -150,7 +161,7 @@ class BaseDetector:
         Detector specific initialization, initialize resource that is
         unique for a specific detector
         """
-        pass
+        self.initialized = True
 
     def process_training_data(self, data, processors):
         res = data.copy()
@@ -158,6 +169,7 @@ class BaseDetector:
             res = processor.process_training_data(res)
         return res
 
+    @require_initialize
     def train(self, training_data):
         """
         This is a optional training process for the anomaly detection
@@ -171,6 +183,7 @@ class BaseDetector:
             res = processor.processTestingdata(res)
         return res
 
+    @require_initialize
     def handle_record(self, record):
         """
         This is the main anomaly detection method, it deals with streaming data
@@ -178,6 +191,7 @@ class BaseDetector:
         """
         raise NotImplementedError
 
+    @require_initialize
     def handle_record_sequence(self, record_sequence):
         """
         This function provide an ability to handle a list of data record sequentially

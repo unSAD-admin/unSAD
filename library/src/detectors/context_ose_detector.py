@@ -32,6 +32,7 @@ class ContextOSEDetector(BaseDetector):
             rest_period=probationary_period / 5.0,
         )
 
+    @BaseDetector.require_initialize
     def handle_record(self, input_data):
         # input_data = self._pre_process_record(input_data)
         input_data = self._pre_process_record(input_data)
