@@ -140,6 +140,8 @@ class BaseDetector:
     def require_initialize(func):
         def check_initialize(self, *args, **kwargs):
             if not self.initialized:
+                logging.error("You didn't initialize the detector by calling "
+                              "initialize method, or you forget to call super.initialize() in child class")
                 raise UnSADException.not_proper_initialize_exception()
             else:
                 return func(self, *args, **kwargs)
