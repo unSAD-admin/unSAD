@@ -71,9 +71,7 @@ def cal_window_f1(path, window_size=50):
 def threshold_experiment(path, window_size=50):
     files = {}
     output = []
-    print('hello')
     for dirpath, dirnames, filenames in os.walk(path):
-        print('hello')
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             if filename == 'all_res.csv':

@@ -49,11 +49,13 @@ class TestHTMDetector(unittest.TestCase):
         # testing handle_record
         print("Testing handle_record()")
         for i in range(5):
+            #those arithmetics are just generating some random number as the input.
             htm.handle_record([2 + i, 6 * i + 3])
 
         # testing train()
         print("Testing train()")
         for i in range(5):
+            #those arithmetics are just generating some random number as the input.
             result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
             print(result)
 
