@@ -138,6 +138,12 @@ class BaseDetector:
                 return symbolic_split.join([str(s) for s in result])
 
     def require_initialize(func):
+        """
+        This is a function decorator to help check whether the detector has
+        been initialize, some function can only be called after initialization
+        You can just add  @BaseDetector.require_initialize to the top of those
+        function
+        """
         def check_initialize(self, *args, **kwargs):
             if not self.initialized:
                 logging.error("You didn't initialize the detector by calling "
