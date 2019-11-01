@@ -57,11 +57,11 @@ class LSTMPredAnomalyDetector(BaseDetector):
             self.train_nonseq2seq(x_train, num_epoches, verbose=verbose)
 
     @BaseDetector.require_initialize
-    def train_seq2seq(self, x_train, num_epoches=300, verbose=False):
+    def train_seq2seq(self, x_train, num_epochs=300, verbose=False):
         learning_rate = 1e-3
         optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
-        for i in range(num_epoches):
+        for i in range(num_epochs):
             # Zero out gradient,
             optimiser.zero_grad()
             x_pred = self.model(x_train)
@@ -91,14 +91,14 @@ class LSTMPredAnomalyDetector(BaseDetector):
         length = x_train.shape[0]
         assert(length > self.window_size)
 
-        optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
+        optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
         # NOTE: set batch size as sequence size
         for i in range(num_epoches):
             for ite in range(len(x_train) // batch_size):
                 # sample index
                 # Zero out gradient,
-                optimiser.zero_grad()
+                optimizer.zero_grad()
 
                 y_test_list = []
                 x_data_list = []
@@ -118,7 +118,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
                 # Backward pass
                 loss.backward()
                 # Update parameters
-                optimiser.step()
+                optimizer.step()
 
     @BaseDetector.require_initialize
     def predict(self, x_new, start=None):

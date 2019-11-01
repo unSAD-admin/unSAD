@@ -204,4 +204,4 @@ class BaseDetector:
         return result
 
     def visualize(self):
-        raise NotImplementedError
+        pass
