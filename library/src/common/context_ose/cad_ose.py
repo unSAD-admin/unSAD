@@ -99,7 +99,7 @@ class ContextualAnomalyDetectorOSE(object):
 
     def getAnomalyScore(self, input_data):
 
-        norm_inp_val = int((input_data["value"] - self.min_value) / self.min_valueStep)
+        norm_inp_val = int((input_data["value"] - self.min_value) / (self.min_valueStep if self.min_valueStep != 0.0 else 0.000001))
         bin_inp_value = bin(norm_inp_val).lstrip("0b").rjust(self.num_norm_value_bits, "0")
 
         out_sens = []
