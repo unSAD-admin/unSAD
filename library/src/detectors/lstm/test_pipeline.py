@@ -8,9 +8,9 @@ from sklearn.metrics import confusion_matrix
 
 import sys
 sys.path.append("../../")
-from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
-from common.dataset import SynthDataset, CSVDataset
 from utils.data_processor import Normalizer
+from common.dataset import SynthDataset, CSVDataset
+from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
 
 parser = argparse.ArgumentParser(
     description='Train and Test anomaly detection algorithm')
@@ -70,6 +70,7 @@ if args.model == 'cnn' and args.seq2seq:
 def anomaly_score(a, b):
     return np.abs(a - b)
 
+
 def _get_file_list():
     if args.dataset == "synth":
         # This is a hack, only one data file
@@ -80,6 +81,7 @@ def _get_file_list():
         raise ValueError("dataset %s not recognized" % args.dataset)
     return file_list
 
+
 def _organize_data(dataset):
     data_train, data_test = dataset.get_data()
     x_train, y_train = data_train["values"], data_train["label"]
@@ -87,6 +89,7 @@ def _organize_data(dataset):
     y_train = y_train.astype(int)
     y_test = y_test.astype(int)
     return x_train, y_train, x_test, y_test
+
 
 def _initialize_model(output_size):
     if args.model in ['lstm', 'cnn']:
@@ -101,6 +104,7 @@ def _initialize_model(output_size):
         raise ValueError("model %s not recognized" % args.model)
     return model
 
+
 def _predict(model, x_total, output_size, start):
    # predict
     x_pred_norm = model.predict(x_total.view(
@@ -108,6 +112,7 @@ def _predict(model, x_total, output_size, start):
     x_pred_norm = x_pred_norm[0, :, 0]
     # convert to numpy
     x_pred_norm = x_pred_norm.numpy()
+
 
 def _save_results(val_score_list, test_score_list, y_val_list, y_test_list):
     total_val_score = np.concatenate(tuple(val_score_list), 0)
@@ -121,6 +126,7 @@ def _save_results(val_score_list, test_score_list, y_val_list, y_test_list):
     np.save(args.save_dir + "/total_test_score", total_test_score)
     np.save(args.save_dir + "/total_y_val", total_y_val)
     np.save(args.save_dir + "/total_y_test", total_y_test)
+
 
 def main():
     # reproducibility
@@ -174,7 +180,11 @@ def main():
         else:
             x_total = torch.cat((x_train_torch, x_test_torch), 0)
         # predict
-        x_pred_norm = _predict(model, x_total, output_size, x_train_torch.shape[0])
+        x_pred_norm = _predict(
+            model,
+            x_total,
+            output_size,
+            x_train_torch.shape[0])
         # calculate score
         test_score = anomaly_score(
             x_pred_norm[-len(x_test_torch):], x_test_norm)
