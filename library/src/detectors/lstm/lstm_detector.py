@@ -100,17 +100,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
                 # Zero out gradient,
                 optimizer.zero_grad()
 
-                y_test_list = []
-                x_data_list = []
-                for _ in range(batch_size):
-                    index = random.randint(self.window_size, length - 1)
-                    y_test = x_train[index, :]
-                    x_data = x_train[index - self.window_size:index, :]
-                    y_test_list.append(y_test)
-                    x_data_list.append(x_data)
-                y_test = torch.stack(y_test_list, 0)
-                x_data = torch.stack(x_data_list, 0)
-
+                x_data, y_test = self._orgranize_data(x_train, batch_size)
                 y_pred = self.model(x_data)
                 loss = loss_fn(y_pred, y_test)
                 if verbose:
@@ -180,3 +170,18 @@ class LSTMPredAnomalyDetector(BaseDetector):
         # plt.plot(hist, label="Training loss")
         # plt.legend()
         # plt.show()
+
+    @BaseDetector.require_initialize
+    def _orgranize_data(self, x, batch_size):
+        y_test_list = []
+        x_data_list = []
+        length = x.shape[0]
+        for _ in range(batch_size):
+            index = random.randint(self.window_size, length - 1)
+            y_test = x[index, :]
+            x_data = x[index - self.window_size:index, :]
+            y_test_list.append(y_test)
+            x_data_list.append(x_data)
+        y_test = torch.stack(y_test_list, 0)
+        x_data = torch.stack(x_data_list, 0)
+        return x_data, y_test
