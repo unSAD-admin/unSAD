@@ -4,7 +4,6 @@ import numpy as np
 import random
 import torch
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
 
 import sys
 sys.path.append("../../")
@@ -106,12 +105,13 @@ def _initialize_model(output_size):
 
 
 def _predict(model, x_total, output_size, start):
-   # predict
+    # predict
     x_pred_norm = model.predict(x_total.view(
         (1, -1, output_size)), start=start)
     x_pred_norm = x_pred_norm[0, :, 0]
     # convert to numpy
     x_pred_norm = x_pred_norm.numpy()
+    return x_pred_norm
 
 
 def _save_results(val_score_list, test_score_list, y_val_list, y_test_list):
@@ -211,6 +211,5 @@ def main():
         _save_results(val_score_list, test_score_list, y_val_list, y_test_list)
 
 
-    # Do something with confusion matrix
 if __name__ == "__main__":
     main()
