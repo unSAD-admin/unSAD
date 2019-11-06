@@ -3,7 +3,10 @@ from collections import Iterable
 import logging
 import sys
 
-sys.path.append("../")
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_path)
 from common.unsad_exceptions import UnSADException
 
 
@@ -144,6 +147,7 @@ class BaseDetector:
         You can just add  @BaseDetector.require_initialize to the top of those
         function
         """
+
         def check_initialize(self, *args, **kwargs):
             if not self.initialized:
                 logging.error("You didn't initialize the detector by calling "

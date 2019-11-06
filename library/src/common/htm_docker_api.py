@@ -4,7 +4,11 @@ import sys
 import json
 import logging
 
-sys.path.append("../")
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_path)
+
 from common.http_api_client import HttpApiClient
 from common.unsad_exceptions import UnSADException
 from utils.docker_manager import init_docker_environment

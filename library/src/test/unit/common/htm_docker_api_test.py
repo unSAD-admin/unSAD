@@ -2,13 +2,15 @@
 
 import sys
 import time
+import os
 
-sys.path.append("../../../")
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(project_path)
 from common.htm_docker_api import HTMApiProvider
 
 
 def test_api():
-    htm = HTMApiProvider(docker_path="../../../../docker/htmDocker/")
+    htm = HTMApiProvider(docker_path=project_path + "/../docker/htmDocker/")
     # Test basic API
     assert htm.recycle_detector() == True
     assert htm.set_max_detector_num(10) == True
@@ -35,6 +37,5 @@ def test_api():
     # pass an array of data to the detector
     result = htm.pass_block_record_to_detector(detector_key, ts, vs)
     t = time.time() - now
-
 
     print(t)

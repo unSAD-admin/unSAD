@@ -6,7 +6,10 @@ import torch
 from sklearn.model_selection import train_test_split
 
 import sys
-sys.path.append("../../")
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(project_path)
 from utils.data_processor import Normalizer
 from common.dataset import SynthDataset, CSVDataset
 from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector

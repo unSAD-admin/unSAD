@@ -2,14 +2,18 @@
 import datetime
 import sys
 
-sys.path.append("../../../")
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(project_path)
+
 from common.dataset import CSVDataset
 from detectors.htm.htm_detector import HTMAnomalyDetector
 
 # the data file should be csv file which contains at least timestamp and value
-data_file_path = "../../../../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
+data_file_path = project_path + "/../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
 # the docker_path is the htm docker's path
-docker_path = "../../../../docker/htmDocker"
+docker_path = project_path + "/../docker/htmDocker"
 
 
 def test_detector():

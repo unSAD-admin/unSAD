@@ -1,7 +1,7 @@
 # Created by Xinyu Zhu on 10/3/2019, 2:47 AM
 
-import sys
 import os
+import sys
 
 project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(project_path)
@@ -9,7 +9,6 @@ sys.path.append(project_path)
 from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
-from utils.analysis import draw_array
 from utils.collection_tools import simple_filter, mean_filter
 
 

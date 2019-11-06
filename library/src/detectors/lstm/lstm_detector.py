@@ -2,8 +2,10 @@ import sys
 import random
 import torch
 import torch.optim as optim
+import os
 
-sys.path.append("../../")
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(project_path)
 from detectors.base import BaseDetector
 from model import ADLSTM, ADCNN
 
@@ -84,12 +86,12 @@ class LSTMPredAnomalyDetector(BaseDetector):
             verbose=False):
         # make sure it's one sequence
         learning_rate = 1e-3
-        assert(x_train.shape[0] == 1)
+        assert (x_train.shape[0] == 1)
         x_train = x_train[0, :, :]
 
         # legnth of the sequence
         length = x_train.shape[0]
-        assert(length > self.window_size)
+        assert (length > self.window_size)
 
         optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
@@ -132,7 +134,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
     @BaseDetector.require_initialize
     def predict_nonseq2seq(self, x_new, start=None):
         # seq2seq
-        assert(x_new.shape[0] == 1)
+        assert (x_new.shape[0] == 1)
         x_new = x_new[0, :, :]
         x_data_list = []
         for index in range(start, x_new.shape[0]):

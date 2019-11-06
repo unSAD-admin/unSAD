@@ -1,7 +1,8 @@
 # Created by Xinyu Zhu on 10/7/2019, 12:53 AM
 import sys
-
-sys.path.append("../../../")
+import os
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(project_path)
 
 from detectors.relative_entropy_detector import RelativeEntropyDetector
 from common.dataset import CSVDataset
@@ -11,7 +12,7 @@ from common.dataset import CSVDataset
 
 def test_detector():
     # read in the data
-    file_path = "../../../../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
+    file_path = project_path + "/../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
     data = CSVDataset(file_path, header=1, values=1, test_size=0).get_data()[0]["values"]
 
     # finding min max of the value

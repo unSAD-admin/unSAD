@@ -1,7 +1,10 @@
 # Created by Xinyu Zhu on 10/6/2019, 11:53 PM
 import sys
 
-sys.path.append("../../")
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(project_path)
 from common.context_ose.context_operator import ContextOperator
 
 

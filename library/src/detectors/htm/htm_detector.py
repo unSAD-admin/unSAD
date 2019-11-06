@@ -1,6 +1,9 @@
 import sys
 
-sys.path.append('../../')
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(project_path)
 
 from detectors.base import BaseDetector
 from common.htm_docker_api import HTMApiProvider
@@ -29,7 +32,6 @@ class HTMAnomalyDetector(BaseDetector):
             tag='htm/htm:1.0',
             *args,
             **kwargs):
-
 
         super(HTMAnomalyDetector, self).initialize(*args, **kwargs)
 
