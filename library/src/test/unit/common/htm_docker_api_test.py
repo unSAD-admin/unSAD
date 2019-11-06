@@ -6,11 +6,12 @@ import time
 sys.path.append("../../../")
 from common.htm_docker_api import HTMApiProvider
 
-if __name__ == '__main__':
+
+def test_api():
     htm = HTMApiProvider(docker_path="../../../../docker/htmDocker/")
     # Test basic API
-    print(htm.recycle_detector())
-    print(htm.set_max_detector_num(10))
+    assert htm.recycle_detector() == True
+    assert htm.set_max_detector_num(10) == True
 
     # create new detector with default parameters
     detector_key = htm.create_new_detector()  # keep the detector_key
@@ -35,7 +36,5 @@ if __name__ == '__main__':
     result = htm.pass_block_record_to_detector(detector_key, ts, vs)
     t = time.time() - now
 
-    for r in result:
-        print(r)
-    print(result)
+
     print(t)

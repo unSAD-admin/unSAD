@@ -7,7 +7,6 @@ sys.path.append("../../../")
 from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
-from utils.analysis import draw_array
 from utils.collection_tools import simple_filter, mean_filter
 
 
@@ -31,17 +30,11 @@ def readFile(filename):
     return new_result
 
 
-if __name__ == '__main__':
-
+def test_sequence():
     data = {"training1": readFile("../../../../data/login_trace/login.trace_9809181415.int"),
             "training2": readFile("../../../../data/login_trace/login.trace_9809251022.int"),
             "testing": readFile("../../../../data/login_trace/login-homegrown.int"),
             "recover": readFile("../../../../data/login_trace/login-recovered.int")}
-
-    trainingids = list(data["training1"].keys())
-    testingids = list(data["testing"].keys())
-    testingnormal = list(data["training2"].keys())
-    testingrecover = list(data["recover"].keys())
 
     sequence = []
     for key in data["training1"]:
@@ -70,5 +63,5 @@ if __name__ == '__main__':
 
     result = simple_filter(result, mean_filter, window_size)
     # print(result)
-    draw_array(result)
+    # draw_array(result)
     # detector.handle_record_sequence()

@@ -58,7 +58,6 @@ class HTMAnomalyDetector(BaseDetector):
         return self.htm.pass_record_to_detector(self.detector_key,
                                                 record[0], record[1])
 
-
     @BaseDetector.require_initialize
     def train(self, training_data):
         ts = []
