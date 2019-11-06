@@ -1,12 +1,15 @@
 # Created by Xinyu Zhu on 10/3/2019, 2:47 AM
 
 import sys
+import os
 
-sys.path.append("../../../")
+project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(project_path)
 
 from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
+from utils.analysis import draw_array
 from utils.collection_tools import simple_filter, mean_filter
 
 
@@ -30,11 +33,17 @@ def readFile(filename):
     return new_result
 
 
-def test_sequence():
-    data = {"training1": readFile("../../../../data/login_trace/login.trace_9809181415.int"),
-            "training2": readFile("../../../../data/login_trace/login.trace_9809251022.int"),
-            "testing": readFile("../../../../data/login_trace/login-homegrown.int"),
-            "recover": readFile("../../../../data/login_trace/login-recovered.int")}
+if __name__ == '__main__':
+
+    data = {"training1": readFile(project_path + "/../data/login_trace/login.trace_9809181415.int"),
+            "training2": readFile(project_path + "/../data/login_trace/login.trace_9809251022.int"),
+            "testing": readFile(project_path + "/../data/login_trace/login-homegrown.int"),
+            "recover": readFile(project_path + "/../data/login_trace/login-recovered.int")}
+
+    trainingids = list(data["training1"].keys())
+    testingids = list(data["testing"].keys())
+    testingnormal = list(data["training2"].keys())
+    testingrecover = list(data["recover"].keys())
 
     sequence = []
     for key in data["training1"]:
@@ -63,5 +72,5 @@ def test_sequence():
 
     result = simple_filter(result, mean_filter, window_size)
     # print(result)
-    # draw_array(result)
+    #draw_array(result)
     # detector.handle_record_sequence()
