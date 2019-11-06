@@ -60,6 +60,7 @@ class RelativeEntropyDetector(BaseDetector):
     def initialize(self, input_min, input_max, n_nins=5, window_size=52, *args, **kwargs):
         """A fact about this detector is that is requires the knowledge of the min_value and max_value"""
         super(RelativeEntropyDetector, self).initialize(args, kwargs)
+
         self.input_min = input_min
 
         self.input_max = input_max

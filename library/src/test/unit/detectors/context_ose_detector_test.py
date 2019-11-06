@@ -16,16 +16,11 @@ class TestContextOseDetector(unittest.TestCase):
 
         # read in the data
         file_path = "../../../../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
-        data = CSVDataset(file_path, header=1, values=1, test_size=0).getData()[0]["values"]
+        data = CSVDataset(file_path, header=1, values=1, test_size=0).get_data()[0]["values"]
 
         # finding min max of the value
-        min_value = 10e10
-        max_value = -10e10
-        for record in data:
-            if min_value > record:
-                min_value = record
-            if max_value < record:
-                max_value = record
+        min_value = min(data)
+        max_value = max(data)
 
         # initialize the detector
         detector = ContextOSEDetector()

@@ -33,17 +33,8 @@ class SequentialPatternAnomalyDetector(BaseDetector):
                              measure_col_names=measure_col_names,
                              symbolic=True)
 
-    def initialize(
-            self,
-            window_size=60,
-            reduce_factor=2,
-            *args,
-            **kwargs
-    ):
-
-        super(SequentialPatternAnomalyDetector, self).initialize(*args,
-                                                                 **kwargs)
-
+    def initialize(self, window_size=60, reduce_factor=2, *args, **kwargs):
+        super(SequentialPatternAnomalyDetector, self).initialize(*args, **kwargs)
         # the window size: the detector use prefix patterns with length <= window size to predict next symbol
 
         self.window_size = window_size

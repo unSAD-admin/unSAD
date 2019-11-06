@@ -19,6 +19,7 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
+
 class ContextOperator:
     """
     Contextual Anomaly Detector - Open Source Edition
@@ -36,9 +37,9 @@ class ContextOperator:
         self.crossed_semi_contexts_lists = [[], []]
         self.contexts_values_list = []
 
-        self.new_context_id = False
+        self.new_context_id = None
 
-    def getContextByFacts(self, new_contexts_list, zerolevel=0):
+    def get_context_by_facts(self, new_contexts_list, zerolevel=0):
         """
         The function which determines by the complete facts list whether the
         context is already saved to the memory. If the context is not found the
@@ -46,9 +47,9 @@ class ContextOperator:
         occupied memory the contexts are divided into semi-contexts as several
         contexts can contain the same facts set in its left and right parts.
         @param new_contexts_list:     list of potentially new contexts
-        @param zerolevel:         flag indicating the context type in
+        @param zerolevel:             flag indicating the context type in
                         transmitted list
-        @return : depending on the type of  potentially new context transmitted as
+        @return : depending on the type of potentially new context transmitted as
               an input parameters the function returns either:
               a) flag indicating that the transmitted zero-level context is
               a new/existing one;
@@ -111,17 +112,18 @@ class ContextOperator:
 
         return num_added_contexts
 
-    def contextCrosser(self,
-                       left_or_right,
-                       facts_list,
-                       new_context_flag=False,
-                       potential_new_contexts=None):
+    def context_crosser(self,
+                        left_or_right,
+                        facts_list,
+                        new_context_flag=False,
+                        potential_new_contexts=None):
 
         if left_or_right == 0:
             if len(potential_new_contexts) > 0:
-                num_new_contexts = self.getContextByFacts(potential_new_contexts)
+                num_new_contexts = self.get_context_by_facts(potential_new_contexts)
             else:
                 num_new_contexts = 0
+            return num_new_contexts
 
         for semiContextValues in self.crossed_semi_contexts_lists[left_or_right]:
             semiContextValues[0] = []
@@ -142,12 +144,12 @@ class ContextOperator:
         self.crossed_semi_contexts_lists[left_or_right] = new_crossed_values
 
         if left_or_right:
-            return self.updateContextsAndGetActive(new_context_flag)
+            return self.update_contexts_and_get_active(new_context_flag)
 
         else:
             return num_new_contexts
 
-    def updateContextsAndGetActive(self, new_context_flag):
+    def update_contexts_and_get_active(self, new_context_flag):
         """
         This function reviews the list of previously selected left semi-contexts,
         creates the list of potentially new contexts resulted from intersection
@@ -210,6 +212,6 @@ class ContextOperator:
                             right_facts = tuple(right_sem_con_val0)
                             potential_new_contexts.append(tuple([left_facts, right_facts]))
 
-        self.new_context_id = False
+        self.new_context_id = None
 
         return active_contexts, num_selected_context, potential_new_contexts

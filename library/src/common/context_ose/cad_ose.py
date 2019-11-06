@@ -51,14 +51,14 @@ class ContextualAnomalyDetectorOSE(object):
         if len(self.left_facts_group) > 0 and len(curr_sens_facts) > 0:
             pot_new_zero_level_context = tuple([self.left_facts_group, curr_sens_facts])
             uniq_pot_new_contexts.add(pot_new_zero_level_context)
-            new_context_flag = self.context_operator.getContextByFacts(
+            new_context_flag = self.context_operator.get_context_by_facts(
                 [pot_new_zero_level_context],
                 zerolevel=1
             )
         else:
             new_context_flag = False
 
-        left_crossing = self.context_operator.contextCrosser(
+        left_crossing = self.context_operator.context_crosser(
             left_or_right=1,
             facts_list=curr_sens_facts,
             new_context_flag=new_context_flag
@@ -82,7 +82,7 @@ class ContextualAnomalyDetectorOSE(object):
         left_facts_group.update(curr_sens_facts, curr_neur_facts)
         self.left_facts_group = tuple(sorted(left_facts_group))
 
-        num_new_cont = self.context_operator.contextCrosser(
+        num_new_cont = self.context_operator.context_crosser(
             left_or_right=0,
             facts_list=self.left_facts_group,
             potential_new_contexts=pot_new_contexts
@@ -97,14 +97,15 @@ class ContextualAnomalyDetectorOSE(object):
 
         return percent_selected_context_active, percent_added_context_to_uniq_pot_new
 
-    def getAnomalyScore(self, input_data):
+    def get_anomaly_score(self, input_data):
 
-        norm_inp_val = int((input_data["value"] - self.min_value) / (self.min_valueStep if self.min_valueStep != 0.0 else 0.000001))
+        norm_inp_val = int(
+            (input_data["value"] - self.min_value) / (self.min_valueStep if self.min_valueStep != 0.0 else 0.000001))
         bin_inp_value = bin(norm_inp_val).lstrip("0b").rjust(self.num_norm_value_bits, "0")
 
         out_sens = []
-        for sNum, currSymb in enumerate(reversed(bin_inp_value)):
-            out_sens.append(sNum * 2 + (1 if currSymb == "1" else 0))
+        for sNum, curr_symb in enumerate(reversed(bin_inp_value)):
+            out_sens.append(sNum * 2 + (1 if curr_symb == "1" else 0))
         set_out_sens = set(out_sens)
 
         anomaly_val1, anomaly_val2 = self.step(set_out_sens)
