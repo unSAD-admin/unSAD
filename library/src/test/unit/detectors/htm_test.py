@@ -8,10 +8,12 @@ from utils.analysis import draw_array
 from common.dataset import CSVDataset
 from detectors.htm.htm_detector import HTMAnomalyDetector
 
-#the data file should be csv file which contains at least timestamp and value
+# the data file should be csv file which contains at least timestamp and value
 data_file_path = "data/ec2_cpu_utilization_5f5533.csv"
-#the docker_path is the htm docker's path
+# the docker_path is the htm docker's path
 docker_path = "../../../../docker/htmDocker"
+
+
 class TestHTMDetector(unittest.TestCase):
 
     def test_detector(self):
@@ -52,13 +54,13 @@ class TestHTMDetector(unittest.TestCase):
         # testing handle_record
         print("Testing handle_record()")
         for i in range(5):
-            #those arithmetics are just generating some random number as the input.
+            # those arithmetics are just generating some random number as the input.
             htm.handle_record([2 + i, 6 * i + 3])
 
         # testing train()
         print("Testing train()")
         for i in range(5):
-            #those arithmetics are just generating some random number as the input.
+            # those arithmetics are just generating some random number as the input.
             result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
             print(result)
 

@@ -13,7 +13,6 @@ from utils.analysis import draw_array
 class TestContextOseDetector(unittest.TestCase):
 
     def test_detector(self):
-
         # read in the data
         file_path = "../../../../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
         data = CSVDataset(file_path, header=1, values=1, test_size=0).get_data()[0]["values"]
