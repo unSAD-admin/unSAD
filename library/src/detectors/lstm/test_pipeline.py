@@ -1,17 +1,15 @@
-
-from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
-from common.dataset import SynthDataset, CSVDataset
-from utils.data_processor import Normalizer
 import glob
 import argparse
 import numpy as np
 import random
 import torch
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
 
 import sys
 sys.path.append("../../")
+from utils.data_processor import Normalizer
+from common.dataset import SynthDataset, CSVDataset
+from detectors.lstm.lstm_detector import LSTMPredAnomalyDetector
 
 parser = argparse.ArgumentParser(
     description='Train and Test anomaly detection algorithm')
@@ -72,17 +70,7 @@ def anomaly_score(a, b):
     return np.abs(a - b)
 
 
-def main():
-    # reproducibility
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    random.seed(args.seed)
-
-    # conf_mat_list = []
-    val_score_list = []
-    test_score_list = []
-    y_val_list = []
-    y_test_list = []
+def _get_file_list():
     if args.dataset == "synth":
         # This is a hack, only one data file
         file_list = [""]
@@ -90,6 +78,68 @@ def main():
         file_list = glob.glob(args.file_prefix + "*")
     else:
         raise ValueError("dataset %s not recognized" % args.dataset)
+    return file_list
+
+
+def _organize_data(dataset):
+    data_train, data_test = dataset.get_data()
+    x_train, y_train = data_train["values"], data_train["label"]
+    x_test, y_test = data_test["values"], data_test["label"]
+    y_train = y_train.astype(int)
+    y_test = y_test.astype(int)
+    return x_train, y_train, x_test, y_test
+
+
+def _initialize_model(output_size):
+    if args.model in ['lstm', 'cnn']:
+        model = LSTMPredAnomalyDetector()
+        model.initialize(
+            output_size,
+            seq2seq=args.seq2seq,
+            use_gpu=args.no_gpu,
+            window_size=args.window_size,
+            model=args.model)
+    else:
+        raise ValueError("model %s not recognized" % args.model)
+    return model
+
+
+def _predict(model, x_total, output_size, start):
+    # predict
+    x_pred_norm = model.predict(x_total.view(
+        (1, -1, output_size)), start=start)
+    x_pred_norm = x_pred_norm[0, :, 0]
+    # convert to numpy
+    x_pred_norm = x_pred_norm.numpy()
+    return x_pred_norm
+
+
+def _save_results(val_score_list, test_score_list, y_val_list, y_test_list):
+    total_val_score = np.concatenate(tuple(val_score_list), 0)
+    total_test_score = np.concatenate(tuple(test_score_list), 0)
+    total_y_val = np.concatenate(tuple(y_val_list), 0)
+    total_y_test = np.concatenate(tuple(y_test_list), 0)
+    import os
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
+    np.save(args.save_dir + "/total_val_score", total_val_score)
+    np.save(args.save_dir + "/total_test_score", total_test_score)
+    np.save(args.save_dir + "/total_y_val", total_y_val)
+    np.save(args.save_dir + "/total_y_test", total_y_test)
+
+
+def main():
+    # reproducibility
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    random.seed(args.seed)
+
+    val_score_list = []
+    test_score_list = []
+    y_val_list = []
+    y_test_list = []
+    file_list = _get_file_list()
+
     for filename in file_list:
         if args.dataset == "synth":
             dataset = SynthDataset()
@@ -97,27 +147,14 @@ def main():
         elif args.dataset == 'yahoo':
             dataset = CSVDataset(filename, header=1, values=1, label=2,
                                  timestamp=0, test_size=args.test_size)
-            data_train, data_test = dataset.get_data()
-            x_train, y_train = data_train["values"], data_train["label"]
-            x_test, y_test = data_test["values"], data_test["label"]
-            y_train = y_train.astype(int)
-            y_test = y_test.astype(int)
+            x_train, y_train, x_test, y_test = _organize_data(dataset)
         elif args.dataset == 'nab':
             dataset = CSVDataset(filename, timestamp=0, values=1, label=2,
                                  test_size=args.test_size)
-            data_train, data_test = dataset.get_data()
-            x_train, y_train = data_train["values"], data_train["label"]
-            x_test, y_test = data_test["values"], data_test["label"]
-            y_train = y_train.astype(int)
-            y_test = y_test.astype(int)
+            x_train, y_train, x_test, y_test = _organize_data(dataset)
         else:
             raise ValueError("dataset %s not recognized" % args.dataset)
 
-        # import matplotlib.pyplot as plt
-        # plt.plot(np.concatenate((x_train, x_test), 0) , label="A4Benchmark-TS74")
-        # # plt.axvline(x=len_train, c='r', linestyle='--')
-        # plt.legend()
-        # plt.show()
         normalizer = Normalizer(zero_mean=True)
         x_train_norm = normalizer.process_training_data(x_train)
         x_test_norm = normalizer.process_testing_data(x_test)
@@ -129,17 +166,9 @@ def main():
         # convert to torch tensor
         x_train_torch = torch.from_numpy(x_train_norm)
         x_test_torch = torch.from_numpy(x_test_norm)
+
         output_size = 1
-        if args.model in ['lstm', 'cnn']:
-            model = LSTMPredAnomalyDetector()
-            model.initialize(
-                output_size,
-                seq2seq=args.seq2seq,
-                use_gpu=args.no_gpu,
-                window_size=args.window_size,
-                model=args.model)
-        else:
-            raise ValueError("model %s not recognized" % args.model)
+        model = _initialize_model(output_size)
 
         # train the model
         model.train(x_train_torch.view((1, -1, output_size)),
@@ -151,11 +180,11 @@ def main():
         else:
             x_total = torch.cat((x_train_torch, x_test_torch), 0)
         # predict
-        x_pred_norm = model.predict(x_total.view(
-            (1, -1, output_size)), start=x_train_torch.shape[0])
-        x_pred_norm = x_pred_norm[0, :, 0]
-        # convert to numpy
-        x_pred_norm = x_pred_norm.numpy()
+        x_pred_norm = _predict(
+            model,
+            x_total,
+            output_size,
+            x_train_torch.shape[0])
         # calculate score
         test_score = anomaly_score(
             x_pred_norm[-len(x_test_torch):], x_test_norm)
@@ -164,21 +193,12 @@ def main():
                 x_train_torch) + len(x_val_torch)], x_val_norm)
             test_score = anomaly_score(
                 x_pred_norm[-len(x_test_torch):], x_test_norm)
-            # conf_mat = confusion_matrix((score > args.thresh).astype(int),
-            #         y_val, labels=[0,1]).ravel()
-            # conf_mat_list.append(conf_mat)
+
             val_score_list.append(val_score)
             test_score_list.append(test_score)
             y_val_list.append(y_val)
             y_test_list.append(y_test)
         else:
-            # if there is label
-            # try:
-            #     conf_mat = confusion_matrix((score > args.thresh).astype(int),
-            #             y_test, labels=[0,1]).ravel()
-            #     conf_mat_list.append(conf_mat)
-            # except NameError:
-            #     pass
             # de-normalize
             x_pred = normalizer.recover_data(x_pred_norm)
             # visualization
@@ -186,24 +206,10 @@ def main():
                 np.concatenate(
                     (x_train, x_test), 0), x_pred, test_score, np.concatenate(
                     (y_train, y_test), 0), len(x_train))
-    # rate_list = []
-    # for i in range(4):
-    #     rate = sum([a[i] for a in conf_mat_list])
-    #     rate_list.append(rate)
-    # print("confusion matrix(tn, fp, fn, tp): ", rate_list)
-    if args.validate:
-        total_val_score = np.concatenate(tuple(val_score_list), 0)
-        total_test_score = np.concatenate(tuple(test_score_list), 0)
-        total_y_val = np.concatenate(tuple(y_val_list), 0)
-        total_y_test = np.concatenate(tuple(y_test_list), 0)
-        import os
-        if not os.path.exists(args.save_dir):
-            os.makedirs(args.save_dir)
-        np.save(args.save_dir + "/total_val_score", total_val_score)
-        np.save(args.save_dir + "/total_test_score", total_test_score)
-        np.save(args.save_dir + "/total_y_val", total_y_val)
-        np.save(args.save_dir + "/total_y_test", total_y_test)
 
-    # Do something with confusion matrix
+    if args.validate:
+        _save_results(val_score_list, test_score_list, y_val_list, y_test_list)
+
+
 if __name__ == "__main__":
     main()
