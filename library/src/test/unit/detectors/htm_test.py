@@ -63,3 +63,8 @@ def test_handle_data():
         # those arithmetics are just generating some random number as the input.
         result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
         print(result)
+
+
+if __name__ == "__main__":
+    test_detector()
+    test_handle_data()

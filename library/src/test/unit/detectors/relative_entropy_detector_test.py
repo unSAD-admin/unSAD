@@ -27,3 +27,6 @@ def test_detector():
     result = detector.handle_record_sequence(data)
     # draw_array(result)
 
+
+if __name__ == "__main__":
+    test_detector()

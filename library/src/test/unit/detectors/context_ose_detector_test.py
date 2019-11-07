@@ -29,3 +29,7 @@ def test_detector():
     # handle all the record
     all_result = detector.handle_record_sequence(data)
     draw_array(all_result)
+
+
+if __name__ == "__main__":
+    test_detector()

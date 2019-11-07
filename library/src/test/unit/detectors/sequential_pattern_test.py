@@ -32,8 +32,7 @@ def readFile(filename):
     return new_result
 
 
-if __name__ == '__main__':
-
+def test_detector():
     data = {"training1": readFile(project_path + "/../data/login_trace/login.trace_9809181415.int"),
             "training2": readFile(project_path + "/../data/login_trace/login.trace_9809251022.int"),
             "testing": readFile(project_path + "/../data/login_trace/login-homegrown.int"),
@@ -70,6 +69,10 @@ if __name__ == '__main__':
     result = detector.handle_record_sequence(sequence)
 
     result = simple_filter(result, mean_filter, window_size)
-    # print(result)
-    #draw_array(result)
+    print(result)
+    # draw_array(result)
     # detector.handle_record_sequence()
+
+
+if __name__ == '__main__':
+    test_detector()
