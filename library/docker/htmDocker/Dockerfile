@@ -1,5 +1,5 @@
 # Follow the following step to build image and start the service
-# start you docker d
+# start you docker
 # docker build -t htm/htm:1.0 .
 # docker run -p 127.0.0.1:8081:8081 -it [image id]
 # nohup python /home/htmHome/detector_service_provider.py
