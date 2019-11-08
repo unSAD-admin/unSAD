@@ -15,14 +15,6 @@ class BaseDetector:
     Base class for all anomaly detectors. When inheriting from this class please
     take note of which methods MUST be overridden, as documented below.
     """
-
-    """
-    Current concern:
-    Symbolic detection or numerical detection?
-    With timestamp or no timestamp
-    Single measure or multiple measure
-    """
-
     def __init__(self, timestamp_col_name=None, measure_col_names=None, symbolic=False):
         """
         Detector independent initialization, initialize resource that is
@@ -61,8 +53,7 @@ class BaseDetector:
         symbolic_split = ","
         if isinstance(data, dict):
             if self.measure is None:
-                logging.error(
-                    "Didn't tell the detector the name of the key pointing to the value to detect")
+                logging.error("Missing the name of keys pointing to values")
                 raise UnSADException.data_format_exception()
             if self.timestamp is not None:
                 if self.timestamp in data:
@@ -71,20 +62,18 @@ class BaseDetector:
                         [result.append(data[measure])
                          for measure in self.measure]
                     except RuntimeError:
-                        logging.error("The input data type is invalid, please make sure "
-                                      "the timestamp is a numerical type")
-                        logging.error("Please make sure the input carries all the field "
+                        logging.error("Invalid input data type, should be a numerical type")
+                        logging.error("Input data should contain all the fields "
                                       "that are specified when initialize the detector: " + str(self.measure))
                         raise UnSADException.data_type_exception()
                 else:
-                    logging.error("This detector requires a timestamp field:" + str(self.timestamp)
-                                  + "but is not presented in input")
+                    logging.error("Input data should contain a timestamp field:" + str(self.timestamp))
                     raise UnSADException.data_format_exception()
             else:
                 try:
                     [result.append(data[measure]) for measure in self.measure]
                 except RuntimeError:
-                    logging.error("Please make sure the input carries all the field "
+                    logging.error("Input data should contain all the fields "
                                   "that are specified when initialize the detector: " + str(self.measure))
                     raise UnSADException.data_format_exception()
         elif isinstance(data, Iterable) and not isinstance(data, str):
@@ -94,8 +83,7 @@ class BaseDetector:
                         result = list(data)
                         result[0] = float(result[0])
                     except RuntimeError as e:
-                        logging.error("The input data type is invalid, please make sure "
-                                      "the timestamp (which in at index 0) is a numerical type")
+                        logging.error("Invalid input data type, timestamp should be a numerical type")
                         raise UnSADException.data_type_exception()
                 else:
                     logging.error("The number of input parameters:" + str(
@@ -116,8 +104,7 @@ class BaseDetector:
                     try:
                         return float(data)
                     except RuntimeError as e:
-                        logging.error("This detector is for numerical data, make sure"
-                                      " the input can be converted to numerical data")
+                        logging.error("Invalid input data type, should be a numerical type")
                         raise UnSADException.data_type_exception()
             else:
                 logging.error("This detector is not initialized properly")
@@ -128,8 +115,7 @@ class BaseDetector:
                 processed_result = [float(result[i])
                                     for i in range(len(result))]
             except RuntimeError as e:
-                logging.error("This detector is for numerical data, make sure"
-                              " the input can be converted to numerical data")
+                logging.error("Invalid input data type, should be a numerical type")
                 raise UnSADException.data_type_exception()
 
             return processed_result[0] if len(processed_result) == 1 else processed_result
@@ -150,8 +136,8 @@ class BaseDetector:
 
         def check_initialize(self, *args, **kwargs):
             if not self.initialized:
-                logging.error("You didn't initialize the detector by calling "
-                              "initialize method, or you forget to call super.initialize() in child class")
+                logging.error("Using detector without initialization "
+                              "or no super.initialize() in child detector")
                 raise UnSADException.not_proper_initialize_exception()
             else:
                 return func(self, *args, **kwargs)
