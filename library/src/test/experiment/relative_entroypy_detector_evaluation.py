@@ -96,7 +96,7 @@ if __name__ == '__main__':
                     if max_value < data_value[i]["value"]:
                         max_value = data_value[i]["value"]
 
-                detector.initialize(input_min=min_value, input_max=max_value, n_nins=nbin, window_size=window)
+                detector.initialize(input_min=min_value, input_max=max_value, n_bins=nbin, window_size=window)
 
                 training_data = []
                 for record in data_value:

@@ -21,7 +21,7 @@ def test_detector():
 
     # initialize the detector
     detector = RelativeEntropyDetector()
-    detector.initialize(input_min=min_value, input_max=max_value, window_size=52, n_nins=5)
+    detector.initialize(input_min=min_value, input_max=max_value, window_size=52, n_bins=5)
 
     # handle all the record
     result = detector.handle_record_sequence(data)
