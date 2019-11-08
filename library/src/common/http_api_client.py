@@ -19,7 +19,6 @@ class HttpApiClient:
         :param params: the parameters of the function
         :return: result of the function call in plain text
         """
-        assert isinstance(params, list)
         url = "http://{ip}:{port}/{path}".format(ip=self.ip, port=self.port, path=path)
         if len(params) != 0:
             for param in params:
@@ -35,8 +34,6 @@ class HttpApiClient:
         :param data: the post data
         :return: result of the function call in plain text
         """
-        assert isinstance(params, list)
-        assert isinstance(data, dict)
         url = "http://{ip}:{port}/{path}".format(ip=self.ip, port=self.port, path=path)
         if len(params) != 0:
             for param in params:
