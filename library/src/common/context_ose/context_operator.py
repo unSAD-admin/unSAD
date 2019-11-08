@@ -142,12 +142,8 @@ class ContextOperator:
                 new_crossed_values.append(semiContextValues)
 
         self.crossed_semi_contexts_lists[left_or_right] = new_crossed_values
+        return self.update_contexts_and_get_active(new_context_flag)
 
-        if left_or_right:
-            return self.update_contexts_and_get_active(new_context_flag)
-
-        else:
-            return num_new_contexts
 
     def update_contexts_and_get_active(self, new_context_flag):
         """

@@ -16,13 +16,6 @@ class BaseDetector:
     take note of which methods MUST be overridden, as documented below.
     """
 
-    """
-    Current concern:
-    Symbolic detection or numerical detection?
-    With timestamp or no timestamp
-    Single measure or multiple measure
-    """
-
     def __init__(self, timestamp_col_name=None, measure_col_names=None, symbolic=False):
         """
         Detector independent initialization, initialize resource that is
