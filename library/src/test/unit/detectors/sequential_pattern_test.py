@@ -33,15 +33,11 @@ def readFile(filename):
 
 
 def test_detector():
+    # read in the data
     data = {"training1": readFile(project_path + "/../data/login_trace/login.trace_9809181415.int"),
             "training2": readFile(project_path + "/../data/login_trace/login.trace_9809251022.int"),
             "testing": readFile(project_path + "/../data/login_trace/login-homegrown.int"),
             "recover": readFile(project_path + "/../data/login_trace/login-recovered.int")}
-
-    trainingids = list(data["training1"].keys())
-    testingids = list(data["testing"].keys())
-    testingnormal = list(data["training2"].keys())
-    testingrecover = list(data["recover"].keys())
 
     sequence = []
     for key in data["training1"]:

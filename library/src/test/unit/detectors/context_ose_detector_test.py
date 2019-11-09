@@ -24,6 +24,8 @@ def test_detector():
 
     # initialize the detector
     detector = ContextOSEDetector()
+
+    # set the probationary period to be 150 for testing
     detector.initialize(min_value=min_value, max_value=max_value, probationary_period=150)
 
     # handle all the record

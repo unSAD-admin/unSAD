@@ -34,6 +34,7 @@ def test_detector():
 
     # initialize the detector, assume a docker service is already running
     detector = HTMAnomalyDetector("timestamp", "value")
+    # set the probation_number to be 10% of the length of the original data set
     detector.initialize(docker_path=docker_path, probation_number=int(len(data) * 0.10),
                         lower_data_limit=min_value,
                         upper_data_limit=max_value)
@@ -53,16 +54,23 @@ def test_handle_data():
     htm.initialize(docker_path=docker_path)
     # testing handle_record
     print("Testing handle_record()")
-    for i in range(5):
-        # those arithmetics are just generating some random number as the input.
-        htm.handle_record([2 + i, 6 * i + 3])
+    # the testing data is in this format [[timestamp, value], [timestamp, value], ...] sorted by timestamp
+    testing_data = [[12, 1], [13, 2], [15, 7], [17, 9], [18, 4]]
 
+    streaming_result = []
+    for record in testing_data:
+        # feed in the testing_data one by one
+        sub_result = htm.handle_record(record)
+        streaming_result.append(sub_result)
+    print(streaming_result)
     # testing train()
     print("Testing train()")
-    for i in range(5):
-        # those arithmetics are just generating some random number as the input.
-        result = htm.train([[2 + i, 6 * i + 3], [5 - i, 5 * i + 1], [9 - i, i + 9]])
-        print(result)
+    # clear the previous memory by calling initialize
+    htm.initialize(docker_path=docker_path)
+    result = htm.train(testing_data)
+    print(result)
+
+    assert result == streaming_result
 
 
 if __name__ == "__main__":

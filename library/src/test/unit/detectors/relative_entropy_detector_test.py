@@ -9,7 +9,6 @@ from common.dataset import CSVDataset
 
 
 
-
 def test_detector():
     # read in the data
     file_path = project_path + "/../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
@@ -21,6 +20,7 @@ def test_detector():
 
     # initialize the detector
     detector = RelativeEntropyDetector()
+    # set the window_size to be 52 and n_bins to be 5 for testing a normal case
     detector.initialize(input_min=min_value, input_max=max_value, window_size=52, n_bins=5)
 
     # handle all the record
