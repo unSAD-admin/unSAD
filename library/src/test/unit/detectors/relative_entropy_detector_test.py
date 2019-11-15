@@ -6,6 +6,7 @@ sys.path.append(project_path)
 
 from detectors.relative_entropy_detector import RelativeEntropyDetector
 from common.dataset import CSVDataset
+from utils.analysis import draw_array
 
 
 
@@ -25,7 +26,7 @@ def test_detector():
 
     # handle all the record
     result = detector.handle_record_sequence(data)
-    # draw_array(result)
+    draw_array(result)
 
 
 if __name__ == "__main__":
