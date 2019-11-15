@@ -4,13 +4,22 @@ import json
 
 
 class HttpApiClient:
-    def __init__(self, ip_address, port=8080):
+    """
+    This is a class used to communicate with Flask server running on docker
+    """
+
+    def __init__(self, ip_address, port=8081):
         self.ip = ip_address
         self.port = str(port)
 
     def call(self, path, params=[]):
-        assert isinstance(params, list)
-        url = "http://" + self.ip + ":" + self.port + "/" + path
+        """
+        Send a Http Get request to call a certain function on the server
+        :param path: the function path of the url
+        :param params: the parameters of the function
+        :return: result of the function call in plain text
+        """
+        url = "http://{ip}:{port}/{path}".format(ip=self.ip, port=self.port, path=path)
         if len(params) != 0:
             for param in params:
                 url += "/" + str(param)
@@ -18,9 +27,14 @@ class HttpApiClient:
         return r.text
 
     def call_with_data(self, path, params=[], data={}):
-        assert isinstance(params, list)
-        assert isinstance(data, dict)
-        url = "http://" + self.ip + ":" + self.port + "/" + path
+        """
+        Send a Http Post request to call a certain function on the server
+        :param path: the function path of the url
+        :param params: the parameters of the function
+        :param data: the post data
+        :return: result of the function call in plain text
+        """
+        url = "http://{ip}:{port}/{path}".format(ip=self.ip, port=self.port, path=path)
         if len(params) != 0:
             for param in params:
                 url += "/" + str(param)

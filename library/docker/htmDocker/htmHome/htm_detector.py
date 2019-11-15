@@ -23,7 +23,6 @@
 import math
 import time
 import random
-from datetime import datetime
 
 from nupic.algorithms import anomaly_likelihood
 from nupic.frameworks.opf.common_models.cluster_params import (
@@ -38,7 +37,9 @@ except:
 
 class HtmDetector:
     """
-    This detector uses an HTM based anomaly detection technique.
+    This is the algorithm layer of HTM which will provides basic algorithm service
+    This class is mainly copied and modified based on
+    https://github.com/numenta/NAB/blob/master/nab/detectors/numenta/numenta_detector.py
     """
 
     def __init__(self):
@@ -58,18 +59,14 @@ class HtmDetector:
         self.useLikelihood = True
 
     def handle_record(self, input_data):
-        """Returns a tuple (anomalyScore, raw_score).
+        """
+        :param input_data:  dict in the following format:
+        {"timestamp": datetime.fromtimestamp(timestamp), "value": value}
+        timestamp must be a datetime object, value must be a float value
+        :return: a tuple (anomalyScore, raw_score)
 
-    Internally to NuPIC "anomalyScore" corresponds to "likelihood_score"
-    and "raw_score" corresponds to "anomaly_score". Sorry about that.
-
-    input_data should be in this format:
-    {"timestamp": datetime.fromtimestamp(timestamp), "value": value}
-    timestamp must be a datatime object
-    value must be a float value
-    """
+       """
         # Send it to Numenta detector and get back the results
-
         result = self.model.run(input_data)
 
         # Get the value
@@ -91,6 +88,10 @@ class HtmDetector:
         if self.min_val is None or value < self.min_val:
             self.min_val = value
 
+        if spatial_anomaly:
+            final_score = 1.0
+            return (final_score, raw_score)
+
         if self.useLikelihood:
             # Compute log(anomaly likelihood)
             anomaly_score = self.anomaly_likelihood.anomalyProbability(
@@ -100,18 +101,15 @@ class HtmDetector:
         else:
             final_score = raw_score
 
-        if spatial_anomaly:
-            final_score = 1.0
-
         return (final_score, raw_score)
 
     def initialize(self, lower_data_limit=-1e9, upper_data_limit=1e9, probation_number=750, spatial_tolerance=0.05):
         """
-            Any data that is not in the range [lower_data_limit, upper_data_limit]
-            will be regarded as anomaly directly
+        Any data that is not in the range [lower_data_limit, upper_data_limit]
+        will be regarded as anomaly directly
 
-            the algorithm will treat the first probation_number input as a reference to calculate likelihood
-            It is expect that no anomaly should be in the first probation_number sample, the longer the better
+        the algorithm will treat the first probation_number input as a reference to calculate likelihood
+        It is expect that no anomaly should be in the first probation_number sample, the longer the better
         """
         self.probationary_period = probation_number
         self.input_min = lower_data_limit
@@ -148,6 +146,7 @@ class HtmDetector:
                 reestimationPeriod=100
             )
 
+
     def _setupEncoderParams(self, encoderParams):
         # The encoder must expect the NAB-specific datafile headers
         encoderParams["timestamp_dayOfWeek"] = encoderParams.pop("c0_dayOfWeek")
@@ -163,6 +162,9 @@ class HtmDetector:
 
 
 class DetectorServiceProvider:
+    """
+    This is the resource management layer
+    """
 
     def __init__(self, max_size=100):
 
@@ -179,9 +181,9 @@ class DetectorServiceProvider:
         self.all_detectors.append(key)
         self.detectors[key] = htm_detector
         # FIFO protocol to recycle the detectors
-        # while len(self.all_detectors) > self.max_size:
-        #     key_to_delete = self.all_detectors.pop(0)
-        #     del self.detectors[key_to_delete]
+        while len(self.all_detectors) > self.max_size:
+            key_to_delete = self.all_detectors.pop(0)
+            del self.detectors[key_to_delete]
         return key
 
     def recycle_all_detectors(self):
@@ -195,23 +197,5 @@ class DetectorServiceProvider:
         if detector_key in self.detectors:
             return self.detectors[detector_key].handle_record(input_data)
         else:
-            # the detector is no longer exsit
+            # the detector is no longer exist
             return None
-
-
-if __name__ == '__main__':
-    detector = HtmDetector()
-    detector.initialize()
-    result = []
-    with open("ec2_cpu_utilization_5f5533.csv") as f:
-        content = f.read().split("\n")
-        for raw in content[1:]:
-            if raw != None and raw != "":
-                r = raw.split(",")
-                timestamp = time.mktime(time.strptime(r[0], '%Y-%m-%d  %H:%M:%S'))
-                value = float(r[1])
-
-                result.append(detector.handle_record({"timestamp": datetime.fromtimestamp(timestamp), "value": value}))
-    with open("output.txt", "w") as f:
-        for r in result:
-            f.write(str(r) + "\n")

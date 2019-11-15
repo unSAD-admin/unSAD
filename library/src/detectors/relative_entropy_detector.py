@@ -23,10 +23,15 @@
 
 import math
 import numpy
+import sys
 
 from scipy import stats
 
-from base import BaseDetector
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_path)
+from detectors.base import BaseDetector
 
 
 class RelativeEntropyDetector(BaseDetector):
@@ -55,9 +60,10 @@ class RelativeEntropyDetector(BaseDetector):
             super(RelativeEntropyDetector, self).__init__(timestamp_col_name=None,
                                                           measure_col_names=["value"], symbolic=False)
 
-    def initialize(self, input_min, input_max, *args, **kwargs):
+    def initialize(self, input_min, input_max, n_bins=5, window_size=52, *args, **kwargs):
         """A fact about this detector is that is requires the knowledge of the min_value and max_value"""
         super(RelativeEntropyDetector, self).initialize(args, kwargs)
+
         self.input_min = input_min
 
         self.input_max = input_max
@@ -66,10 +72,10 @@ class RelativeEntropyDetector(BaseDetector):
         self.util = []
 
         # Number of bins into which util is to be quantized
-        self.n_bins = 5
+        self.n_bins = n_bins
 
         # Window size
-        self.W = 52
+        self.window_size = window_size
 
         # Threshold against which the test statistic is compared. It is set to
         # the point in the chi-squared cdf with N-bins -1 degrees of freedom that
@@ -92,6 +98,7 @@ class RelativeEntropyDetector(BaseDetector):
         # List where c[i] tracks the number of windows that agree with P[i]
         self.c = []
 
+    @BaseDetector.require_initialize
     def handle_record(self, input_data):
         """ Returns a list of [anomalyScore] that takes a binary value of 0 or 1.
         The anomalyScore is determined based on the agreement of the observed data
@@ -104,7 +111,7 @@ class RelativeEntropyDetector(BaseDetector):
         """
         input_data = self._pre_process_record(input_data)
         anomaly_score = 0.0
-        self.util.append(input_data[0])
+        self.util.append(input_data)
 
         #  This check is for files where self.inputMin == self.input max i.e
         #  all data points are identical and stepSize is 0 e.g
@@ -115,10 +122,10 @@ class RelativeEntropyDetector(BaseDetector):
             # All points in the first window are declared non-anomolous and
             # anomaly detection begins when length of data points seen is
             # greater than window length.
-            if len(self.util) >= self.W:
+            if len(self.util) >= self.window_size:
 
                 # Extracting current window
-                util_current = self.util[-self.W:]
+                util_current = self.util[-self.window_size:]
 
                 # Quantize window data points into discretized bin values
                 b_current = [math.ceil((c - self.input_min) / self.step_size) for c in
@@ -137,7 +144,7 @@ class RelativeEntropyDetector(BaseDetector):
                     self.c.append(1)
                     self.m = 1
                 else:
-                    index = self.getAgreementHypothesis(p_hat)
+                    index = self.get_agreement_hypothesis(p_hat)
 
                     # Check if any null hypothesis is accepted or rejected
                     if index != -1:
@@ -161,7 +168,7 @@ class RelativeEntropyDetector(BaseDetector):
 
         return anomaly_score
 
-    def getAgreementHypothesis(self, P_hat):
+    def get_agreement_hypothesis(self, P_hat):
         """This function computes multinomial goodness-of-fit test. It calculates
         the relative entropy test statistic between P_hat and all `m` null
         hypothesis and compares it against the threshold `T` based on cdf of
@@ -179,7 +186,7 @@ class RelativeEntropyDetector(BaseDetector):
         index = -1
         min_entropy = float("inf")
         for i in range(self.m):
-            entropy = 2 * self.W * stats.entropy(P_hat, self.P[i])
+            entropy = 2 * self.window_size * stats.entropy(P_hat, self.P[i])
             if entropy < self.T and entropy < min_entropy:
                 min_entropy = entropy
                 index = i

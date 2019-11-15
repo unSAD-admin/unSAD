@@ -1,6 +1,13 @@
 # Created by Xinyu Zhu on 10/2/2019, 11:46 PM
 from collections import Iterable
-import numpy as np
+import logging
+import sys
+
+import os
+
+project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_path)
+from common.unsad_exceptions import UnSADException
 
 
 class BaseDetector:
@@ -8,14 +15,6 @@ class BaseDetector:
     Base class for all anomaly detectors. When inheriting from this class please
     take note of which methods MUST be overridden, as documented below.
     """
-
-    """
-    Current concern:
-    Symbolic detection or numerical detection?
-    With timestamp or no timestamp
-    Single measure or multiple measure
-    """
-
     def __init__(self, timestamp_col_name=None, measure_col_names=None, symbolic=False):
         """
         Detector independent initialization, initialize resource that is
@@ -25,12 +24,16 @@ class BaseDetector:
         timestamp_col_name: the column name for timestamp
         measure_col_names: the list of column name that need to be considered by detector
         """
-        assert timestamp_col_name is None or isinstance(timestamp_col_name, str)
-        assert measure_col_names is None or (isinstance(measure_col_names, list) and len(measure_col_names) > 0)
+        assert timestamp_col_name is None or isinstance(
+            timestamp_col_name, str)
+        assert measure_col_names is None or (isinstance(
+            measure_col_names, list) and len(measure_col_names) > 0)
         assert isinstance(symbolic, bool)
         self.timestamp = timestamp_col_name
         self.measure = measure_col_names
         self.symbolic = symbolic
+
+        self.initialized = False
 
     def _check_parameter(self, data):
         """
@@ -50,39 +53,49 @@ class BaseDetector:
         symbolic_split = ","
         if isinstance(data, dict):
             if self.measure is None:
-                return None
+                logging.error("Missing the name of keys pointing to values")
+                raise UnSADException.data_format_exception()
             if self.timestamp is not None:
                 if self.timestamp in data:
                     try:
                         result.append(float(data[self.timestamp]))
-                        [result.append(data[measure]) for measure in self.measure]
+                        [result.append(data[measure])
+                         for measure in self.measure]
                     except RuntimeError:
-                        return None
+                        logging.error("Invalid input data type, should be a numerical type")
+                        logging.error("Input data should contain all the fields "
+                                      "that are specified when initialize the detector: " + str(self.measure))
+                        raise UnSADException.data_type_exception()
                 else:
-                    return None
+                    logging.error("Input data should contain a timestamp field:" + str(self.timestamp))
+                    raise UnSADException.data_format_exception()
             else:
                 try:
                     [result.append(data[measure]) for measure in self.measure]
                 except RuntimeError:
-                    return None
+                    logging.error("Input data should contain all the fields "
+                                  "that are specified when initialize the detector: " + str(self.measure))
+                    raise UnSADException.data_format_exception()
         elif isinstance(data, Iterable) and not isinstance(data, str):
             if self.timestamp is not None:
                 if len(data) == len(self.measure) + 1:
                     try:
-                        result = data
+                        result = list(data)
                         result[0] = float(result[0])
                     except RuntimeError as e:
-                        return None
+                        logging.error("Invalid input data type, timestamp should be a numerical type")
+                        raise UnSADException.data_type_exception()
                 else:
-                    return None
+                    logging.error("The number of input parameters:" + str(
+                        len(data)) + " does not match with this detectors:" + str(len(self.measure) + 1))
+                    raise UnSADException.input_number_exception()
             else:
                 if len(data) == len(self.measure):
-                    try:
-                        result = data
-                    except RuntimeError as e:
-                        return None
+                    result = data
                 else:
-                    return None
+                    logging.error("The number of input parameters:" + str(
+                        len(data)) + " does not match with this detectors:" + str(len(self.measure)))
+                    raise UnSADException.input_number_exception()
         else:
             if (self.measure is None or len(self.measure) == 1) and self.timestamp is None:
                 if self.symbolic:
@@ -91,17 +104,45 @@ class BaseDetector:
                     try:
                         return float(data)
                     except RuntimeError as e:
-                        return None
+                        logging.error("Invalid input data type, should be a numerical type")
+                        raise UnSADException.data_type_exception()
             else:
-                return None
+                logging.error("This detector is not initialized properly")
+                raise UnSADException.not_proper_initialize_exception()
 
         if not self.symbolic:
-            return [float(result[i]) for i in range(len(result))]
+            try:
+                processed_result = [float(result[i])
+                                    for i in range(len(result))]
+            except RuntimeError as e:
+                logging.error("Invalid input data type, should be a numerical type")
+                raise UnSADException.data_type_exception()
+
+            return processed_result[0] if len(processed_result) == 1 else processed_result
+
         else:
             if self.timestamp is not None:
                 return [result[0], symbolic_split.join([str(s) for s in result[1:]])]
             else:
                 return symbolic_split.join([str(s) for s in result])
+
+    def require_initialize(func):
+        """
+        This is a function decorator to help check whether the detector has
+        been initialize, some function can only be called after initialization
+        You can just add  @BaseDetector.require_initialize to the top of those
+        function
+        """
+
+        def check_initialize(self, *args, **kwargs):
+            if not self.initialized:
+                logging.error("Using detector without initialization "
+                              "or no super.initialize() in child detector")
+                raise UnSADException.not_proper_initialize_exception()
+            else:
+                return func(self, *args, **kwargs)
+
+        return check_initialize
 
     def get_data_format(self):
         """
@@ -118,14 +159,15 @@ class BaseDetector:
         Detector specific initialization, initialize resource that is
         unique for a specific detector
         """
-        pass
+        self.initialized = True
 
     def process_training_data(self, data, processors):
         res = data.copy()
         for processor in processors:
-            res = processor.processTrainingData(res)
+            res = processor.process_training_data(res)
         return res
 
+    @require_initialize
     def train(self, training_data):
         """
         This is a optional training process for the anomaly detection
@@ -139,6 +181,7 @@ class BaseDetector:
             res = processor.processTestingdata(res)
         return res
 
+    @require_initialize
     def handle_record(self, record):
         """
         This is the main anomaly detection method, it deals with streaming data
@@ -146,6 +189,7 @@ class BaseDetector:
         """
         raise NotImplementedError
 
+    @require_initialize
     def handle_record_sequence(self, record_sequence):
         """
         This function provide an ability to handle a list of data record sequentially
@@ -156,4 +200,4 @@ class BaseDetector:
         return result
 
     def visualize(self):
-        raise NotImplementedError
+        pass
