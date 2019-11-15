@@ -10,6 +10,7 @@ from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
 from utils.collection_tools import simple_filter, mean_filter
+from utils.analysis import draw_array
 
 
 def readFile(filename):
@@ -59,14 +60,14 @@ def test_detector():
     print(sequence)
 
     detector = SequentialPatternAnomalyDetector()
-    window_size = 60
+    window_size = 20
     detector.initialize(window_size)
 
     result = detector.handle_record_sequence(sequence)
 
     result = simple_filter(result, mean_filter, window_size)
     print(result)
-    # draw_array(result)
+    draw_array(result)
     # detector.handle_record_sequence()
 
 
