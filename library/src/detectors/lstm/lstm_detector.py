@@ -156,7 +156,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
         # import numpy as np
         # x_pred = np.load("x_pred.npy")
         plt.plot(x_train, label="Data")
-        plt.plot(x_pred, label="Preds")
+        plt.plot(x_pred, label="Prediction")
         plt.axvline(x=len_train, c='r', linestyle='--')
         x_list = []
         y_list = []
@@ -165,6 +165,8 @@ class LSTMPredAnomalyDetector(BaseDetector):
                 x_list.append(index)
                 y_list.append(x_train[index])
         plt.plot(x_list, y_list, 'ro')
+        plt.xlabel('time')
+        plt.ylabel("value")
         plt.legend()
         plt.show()
 
