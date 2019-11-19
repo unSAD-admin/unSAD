@@ -1,7 +1,6 @@
 # Created by Xinyu Zhu on 10/21/2019, 10:23 PM
 
 import sys
-import time
 import os
 
 project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -12,30 +11,33 @@ from common.htm_docker_api import HTMApiProvider
 def test_api():
     htm = HTMApiProvider(docker_path=project_path + "/../docker/htmDocker/")
     # Test basic API
-    assert htm.recycle_detector() == True
-    assert htm.set_max_detector_num(10) == True
+    assert htm.recycle_detector() is True
+    assert htm.set_max_detector_num(10) is True
 
     # create new detector with default parameters
     detector_key = htm.create_new_detector()  # keep the detector_key
 
     print(detector_key)
     result = []
-    now = time.time()
-    for i in range(4):
+    # the testing data is in this format [[timestamp, value], [timestamp, value], ...] sorted by timestamp
+    testing_data = [[12, 1], [13, 2], [15, 7], [17, 9], [18, 4]]
+    for record in testing_data:
         # pass the data record to the detector
-        result.append(htm.pass_record_to_detector(detector_key, i + 1, 0.12 + i * 2))
-    t = time.time() - now
+        result.append(htm.pass_record_to_detector(detector_key, record[0],record[1]))
     print(result)
-    print(t)
 
     ts = []
     vs = []
-    for i in range(4, 400):
-        ts.append(i + 1)
-        vs.append(0.12 + i * 2)
-    now = time.time()
+    for record in testing_data:
+        ts.append(record[0])
+        vs.append(record[1])
     # pass an array of data to the detector
-    result = htm.pass_block_record_to_detector(detector_key, ts, vs)
-    t = time.time() - now
+    next_result = htm.pass_block_record_to_detector(detector_key, ts, vs)
+    print(next_result)
+    # these two result should not be equal although the input are the same
+    # because the calculation of next_result is based on previous memory
+    assert result != next_result
 
-    print(t)
+
+if __name__ == '__main__':
+    test_api()

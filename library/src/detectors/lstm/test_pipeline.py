@@ -146,7 +146,7 @@ def main():
     for filename in file_list:
         if args.dataset == "synth":
             dataset = SynthDataset()
-            x_train, x_test = dataset.get_data()
+            x_train, y_train, x_test, y_test = dataset.get_data()
         elif args.dataset == 'yahoo':
             dataset = CSVDataset(filename, header=1, values=1, label=2,
                                  timestamp=0, test_size=args.test_size)

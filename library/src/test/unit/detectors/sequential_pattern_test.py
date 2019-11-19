@@ -10,6 +10,7 @@ from collections import defaultdict
 
 from detectors.symbolic.sequential_pattern import SequentialPatternAnomalyDetector
 from utils.collection_tools import simple_filter, mean_filter
+from utils.analysis import draw_array
 
 
 def readFile(filename):
@@ -33,15 +34,11 @@ def readFile(filename):
 
 
 def test_detector():
+    # read in the data
     data = {"training1": readFile(project_path + "/../data/login_trace/login.trace_9809181415.int"),
             "training2": readFile(project_path + "/../data/login_trace/login.trace_9809251022.int"),
             "testing": readFile(project_path + "/../data/login_trace/login-homegrown.int"),
             "recover": readFile(project_path + "/../data/login_trace/login-recovered.int")}
-
-    trainingids = list(data["training1"].keys())
-    testingids = list(data["testing"].keys())
-    testingnormal = list(data["training2"].keys())
-    testingrecover = list(data["recover"].keys())
 
     sequence = []
     for key in data["training1"]:
@@ -63,14 +60,14 @@ def test_detector():
     print(sequence)
 
     detector = SequentialPatternAnomalyDetector()
-    window_size = 60
+    window_size = 20
     detector.initialize(window_size)
 
     result = detector.handle_record_sequence(sequence)
 
     result = simple_filter(result, mean_filter, window_size)
     print(result)
-    # draw_array(result)
+    draw_array(result)
     # detector.handle_record_sequence()
 
 

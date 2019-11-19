@@ -103,7 +103,7 @@ class SequentialPatternAnomalyDetector(BaseDetector):
         while len(self.buffer) > self.window_size:
             self.buffer.pop(0)
         self._count_subsequence(self.buffer)
-        return result
+        return 1 - result
 
     @BaseDetector.require_initialize
     def train(self, training_data):

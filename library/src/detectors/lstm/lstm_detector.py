@@ -102,7 +102,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
                 # Zero out gradient,
                 optimizer.zero_grad()
 
-                x_data, y_test = self._orgranize_data(x_train, batch_size)
+                x_data, y_test = self._organize_data(x_train, batch_size)
                 y_pred = self.model(x_data)
                 loss = loss_fn(y_pred, y_test)
                 if verbose:
@@ -176,7 +176,7 @@ class LSTMPredAnomalyDetector(BaseDetector):
         # plt.show()
 
     @BaseDetector.require_initialize
-    def _orgranize_data(self, x, batch_size):
+    def _organize_data(self, x, batch_size):
         y_test_list = []
         x_data_list = []
         length = x.shape[0]
