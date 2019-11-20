@@ -10,3 +10,4 @@ data
 *.json
 *.csv
 *.gz
+!/library/src/detectors/autoencoder/SofaSofa_Anomaly.csv
