@@ -14,7 +14,7 @@ from utils.collection_tools import windowed_list
 from utils.analysis import draw_array
 
 
-def ttest_detector():
+def test_detector():
     detector = AutoEncoderDetector()
 
     # tell the detector, each input record is of length 2
@@ -36,7 +36,7 @@ def ttest_detector():
     print(detector.handle_record_sequence([[1, 2], [2, 3]]))
 
 
-def ttest_detector_on_file():
+def test_detector_on_file():
     detector = AutoEncoderDetector()
 
     window_size = 4
@@ -64,4 +64,5 @@ def ttest_detector_on_file():
 
 
 if __name__ == '__main__':
-    ttest_detector_on_file()
+    test_detector()
+    test_detector_on_file()
