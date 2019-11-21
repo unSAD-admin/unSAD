@@ -43,6 +43,8 @@ class AutoEncoderDetector(BaseDetector):
 
         print("--------training--------")
 
+        loss_list = []
+
         # Begin to train the model
         optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
@@ -52,6 +54,7 @@ class AutoEncoderDetector(BaseDetector):
             loss = loss_fn(x_pred, x_train)
             if verbose:
                 print("epoch: %d, loss: " % i, loss.item())
+            loss_list.append(loss.item())
 
             # ---------Backward----------
             optimiser.zero_grad()
@@ -65,6 +68,7 @@ class AutoEncoderDetector(BaseDetector):
         all_distance = np.mean(np.power(x_train.cpu().detach().numpy() - x_pred.detach().numpy(), 2), axis=1)
         self.avg_distance = np.mean(all_distance)
         self.std_distance = np.std(all_distance)
+        return loss_list
         # self.avg_distance = np.mean(np.mean(np.abs(x_train - x_pred), axis=1))
 
     @BaseDetector.require_initialize

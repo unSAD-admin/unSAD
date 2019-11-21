@@ -14,7 +14,7 @@ from utils.collection_tools import windowed_list
 from utils.analysis import draw_array
 
 
-def test_detector():
+def ttest_detector():
     detector = AutoEncoderDetector()
 
     # tell the detector, each input record is of length 2
@@ -36,7 +36,7 @@ def test_detector():
     print(detector.handle_record_sequence([[1, 2], [2, 3]]))
 
 
-def test_detector_on_file():
+def ttest_detector_on_file():
     detector = AutoEncoderDetector()
 
     window_size = 4
@@ -54,9 +54,11 @@ def test_detector_on_file():
 
     training_data = torch.from_numpy(np.array(training_data, dtype="float32"))
 
-    detector.train(training_data, num_epochs=4000, verbose=True)
+    loss_list = detector.train(training_data, num_epochs=4000, verbose=True)
 
     result = detector.handle_record_sequence(windowed_data)
+
+    draw_array(loss_list)
 
     draw_array(data)
 
@@ -64,5 +66,5 @@ def test_detector_on_file():
 
 
 if __name__ == '__main__':
-    test_detector()
-    test_detector_on_file()
+    # ttest_detector()
+    ttest_detector_on_file()
