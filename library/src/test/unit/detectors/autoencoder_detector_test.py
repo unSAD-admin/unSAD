@@ -4,6 +4,8 @@ import sys
 import torch
 import numpy as np
 import random
+import matplotlib
+import matplotlib.pyplot as plt
 
 project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(project_path)
@@ -44,7 +46,7 @@ def ttest_detector_on_file():
     # tell the detector, each input record is of length 2
     detector.initialize(window_size)
 
-    file_path = project_path + "/../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv"
+    file_path = project_path + "/../data/NAB_data/data/realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv"
     data = CSVDataset(file_path, header=1, values=1, test_size=0).get_data()[0]["values"]
 
     windowed_data = windowed_list(data, window_size=window_size)
@@ -58,11 +60,30 @@ def ttest_detector_on_file():
 
     result = detector.handle_record_sequence(windowed_data)
 
-    draw_array(loss_list)
+    plt.subplot(311)
+    plt.plot(np.arange(len(loss_list)), loss_list)
+    #plt.title('Loss During Training')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
 
-    draw_array(data)
+    plt.subplot(312)
+    plt.plot(np.arange(len(data)), data)
+    #plt.title('Original Data')
+    plt.xlabel('Index')
+    plt.ylabel('Value')
 
-    draw_array(result)
+    plt.subplot(313)
+    plt.plot(np.arange(len(result)), result)
+    #plt.title('Anomaly score')
+    plt.xlabel('Index')
+    plt.ylabel('Score')
+    plt.show()
+
+    # draw_array(loss_list)
+    #
+    # draw_array(data)
+    #
+    # draw_array(result)
 
 
 if __name__ == '__main__':
