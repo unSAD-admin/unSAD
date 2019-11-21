@@ -12,13 +12,13 @@ class AutoEncoder(nn.Module):  # 16 8
             nn.Linear(num_attributes, 16),
             nn.Tanh(),
             nn.Linear(16, 8),
-            nn.ReLU(True)
+            nn.ReLU()
         )
         self.decode = nn.Sequential(
             nn.Linear(8, 16),
             nn.Tanh(),
             nn.Linear(16, num_attributes),
-            nn.ReLU(True)
+            nn.ReLU()
         )
 
     def forward(self, x):
