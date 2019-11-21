@@ -71,6 +71,15 @@ class AutoEncoderDetector(BaseDetector):
 
         return x_pred
 
+    @BaseDetector.require_initialize
+    def handle_record(self, record):
+        record = np.array(record)
+        x_pred = self.predict(record)
+        distance = np.mean(np.power(record - x_pred, 2), axis=1)
+        # may consider using mae distance
+        # distance = np.mean(np.abs(record - x_pred), axis=1)
+        return distance
+
     def visualize(self, x_new, x_pred, y_label):
         colors = ['dodgerblue', 'coral']
         markers = ['o', '^']
