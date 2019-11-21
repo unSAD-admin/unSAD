@@ -58,19 +58,17 @@ class AutoEncoderDetector(BaseDetector):
             loss.backward()
             optimiser.step()
 
-
         # after training finish, we need the average distance on
         # the training sample to normalize
         # the later distance calculation
         x_pred = self.predict(x_train)
-        all_distance = np.sum(np.power(x_train.cpu().detach().numpy() - x_pred.detach().numpy(), 2), axis=1)
+        all_distance = np.mean(np.power(x_train.cpu().detach().numpy() - x_pred.detach().numpy(), 2), axis=1)
         self.avg_distance = np.mean(all_distance)
         self.std_distance = np.std(all_distance)
         # self.avg_distance = np.mean(np.mean(np.abs(x_train - x_pred), axis=1))
 
     @BaseDetector.require_initialize
     def predict(self, x_test):
-        print(x_test, type(x_test))
         print("--------prediction--------")
         if self.use_gpu:
             x_new = x_test.cuda()
@@ -87,16 +85,23 @@ class AutoEncoderDetector(BaseDetector):
     @BaseDetector.require_initialize
     def handle_record(self, record):
         """
-
         :param record: [v1, v2, v3, ...]
         :return: anomaly score
         """
         record = torch.from_numpy(np.array([record], dtype="float32"))
         x_pred = self.predict(record)
-        distance = np.sum(np.power(record.detach().numpy() - x_pred.detach().numpy(), 2))
+        distance = np.mean(np.power(record.detach().numpy() - x_pred.detach().numpy(), 2))
         # may consider using mae distance
         # distance = np.sum(np.abs(record.detach().numpy() - x_pred.detach().numpy()))
         return abs((distance - self.avg_distance) / self.std_distance)
+
+    @BaseDetector.require_initialize
+    def handle_record_sequence(self, record_sequence):
+        record_sequence = torch.from_numpy(np.array(record_sequence, dtype="float32"))
+        x_pred = self.predict(record_sequence)
+        distance = np.mean(np.power(record_sequence.detach().numpy() - x_pred.detach().numpy(), 2), axis=1)
+        result = np.abs((distance - self.avg_distance) / self.std_distance)
+        return result
 
     def visualize(self, x_new, x_pred, y_label):
         colors = ['dodgerblue', 'coral']
