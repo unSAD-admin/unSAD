@@ -44,7 +44,8 @@ class CSVDataset(Dataset):
             label=None,
             timestamp=None,
             test_size=0.1,
-            batch_size=4096):
+            batch_size=4096,
+            shuffle=False):
         super().__init__()
         self.filename = filename
         self.startrow = header
@@ -54,6 +55,7 @@ class CSVDataset(Dataset):
         self.timestamp = timestamp
         self.test_size = test_size
         self.batch_size = batch_size
+        self.shuffle = shuffle
 
     # Get all data from csv files
     # Return two sets of data, train and test
@@ -69,7 +71,7 @@ class CSVDataset(Dataset):
                 dtype=np.float32,
                 delimiter=',')
             x_train, x_test = train_test_split(
-                x, test_size=self.test_size, shuffle=False)
+                x, test_size=self.test_size, shuffle=self.shuffle)
             return x_train, x_test
         else:
             # Get timestamp, values, label respectively
@@ -93,7 +95,7 @@ class CSVDataset(Dataset):
                 max_rows=self.batch_size)
             self.startrow += x.shape[0]
             x_train, x_test = train_test_split(
-                x, test_size=self.test_size, shuffle=False)
+                x, test_size=self.test_size, shuffle=self.shuffle)
             return x_train, x_test
         else:
             # Get timestamp, values, label respectively
@@ -112,14 +114,14 @@ class CSVDataset(Dataset):
         if self.timestamp is not None:
             t = data[:, self.timestamp]
             t_train, t_test = train_test_split(
-                t, test_size=self.test_size, shuffle=False)
+                t, test_size=self.test_size, shuffle=self.shuffle)
         x = data[:, self.values].astype(np.float32)
         x_train, x_test = train_test_split(
-            x, test_size=self.test_size, shuffle=False)
+            x, test_size=self.test_size, shuffle=self.shuffle)
         if self.label is not None:
             y = data[:, self.label]
             y_train, y_test = train_test_split(
-                y, test_size=self.test_size, shuffle=False)
+                y, test_size=self.test_size, shuffle=self.shuffle)
         return {"timestamp": t_train, "values": x_train, "label": y_train}, \
                {"timestamp": t_test, "values": x_test, "label": y_test}
 
