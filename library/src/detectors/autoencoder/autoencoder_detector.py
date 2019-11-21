@@ -11,18 +11,17 @@ import unittest
 project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_path)
 from detectors.base import BaseDetector
-from model import AutoEncoder
+from detectors.autoencoder.model import AutoEncoder
+
 
 class AutoEncoderDetector(BaseDetector):
-    def __init__(self, timestamp_col_name=None, value_col_name=None):
-        if timestamp_col_name is None:  # since timestamp column name is essential for super class
-            timestamp_col_name = "timestamp"
+    def __init__(self):
 
         super(
             AutoEncoderDetector,
             self).__init__(
-            timestamp_col_name=timestamp_col_name,
-            measure_col_names=[value_col_name],
+            timestamp_col_name=None,
+            measure_col_names=None,
             symbolic=False)
 
     def initialize(self, num_attributes, use_gpu=True):
@@ -95,13 +94,14 @@ class AutoEncoderDetector(BaseDetector):
 
 class TestAutoEncoderDetector(unittest.TestCase):
     def test_vis(self):
-        x_new = np.array([1,2,3,3,2,6,2,3,7,1,2])
+        x_new = np.array([1, 2, 3, 3, 2, 6, 2, 3, 7, 1, 2])
         x_new = x_new.reshape((len(x_new), 1))
-        x_pred = np.array([2,2,3,4,2,3,2,2,3,1,2])
+        x_pred = np.array([2, 2, 3, 4, 2, 3, 2, 2, 3, 1, 2])
         x_pred = x_pred.reshape((len(x_pred), 1))
-        y_label = np.array([0,0,0,0,0,1,0,0,1,0,0])
+        y_label = np.array([0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0])
         detector = AutoEncoderDetector()
         detector.visualize(x_new, x_pred, y_label)
+
 
 if __name__ == '__main__':
     unittest.main()
