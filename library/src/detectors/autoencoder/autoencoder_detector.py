@@ -36,7 +36,7 @@ class AutoEncoderDetector(BaseDetector):
 
     # train the data for num_epoches epochs
     @BaseDetector.require_initialize
-    def train(self, x_train, num_epoches=300, verbose=False, learning_rate=1e-3):
+    def train(self, x_train, num_epochs=300, verbose=False, learning_rate=1e-3):
         if self.use_gpu:
             x_train = x_train.cuda()
 
@@ -45,7 +45,7 @@ class AutoEncoderDetector(BaseDetector):
         # Begin to train the model
         optimiser = optim.Adam(self.model.parameters(), lr=learning_rate)
         loss_fn = torch.nn.L1Loss()
-        for i in range(num_epoches):
+        for i in range(num_epochs):
             # ---------Forward-----------
             x_pred = self.model(x_train)
             loss = loss_fn(x_pred, x_train)
@@ -58,10 +58,12 @@ class AutoEncoderDetector(BaseDetector):
             optimiser.step()
 
     @BaseDetector.require_initialize
-    def predict(self, x_new):
+    def predict(self, x_test):
         print("--------training--------")
         if self.use_gpu:
-            x_new = x_new.cuda()
+            x_new = x_test.cuda()
+        else:
+            x_new = x_test
 
         x_pred = self.model(x_new)
 
