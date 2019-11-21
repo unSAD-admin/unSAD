@@ -29,6 +29,8 @@ class AutoEncoderDetector(BaseDetector):
 
         self.use_gpu = use_gpu and torch.cuda.is_available()
         self.model = AutoEncoder(num_attributes)
+        self.avg_distance = 0
+        self.std_distance = 1
 
         if self.use_gpu:
             self.model.cuda()
@@ -56,9 +58,20 @@ class AutoEncoderDetector(BaseDetector):
             loss.backward()
             optimiser.step()
 
+
+        # after training finish, we need the average distance on
+        # the training sample to normalize
+        # the later distance calculation
+        x_pred = self.predict(x_train)
+        all_distance = np.sum(np.power(x_train.cpu().detach().numpy() - x_pred.detach().numpy(), 2), axis=1)
+        self.avg_distance = np.mean(all_distance)
+        self.std_distance = np.std(all_distance)
+        # self.avg_distance = np.mean(np.mean(np.abs(x_train - x_pred), axis=1))
+
     @BaseDetector.require_initialize
     def predict(self, x_test):
-        print("--------training--------")
+        print(x_test, type(x_test))
+        print("--------prediction--------")
         if self.use_gpu:
             x_new = x_test.cuda()
         else:
@@ -73,12 +86,17 @@ class AutoEncoderDetector(BaseDetector):
 
     @BaseDetector.require_initialize
     def handle_record(self, record):
-        record = np.array(record)
+        """
+
+        :param record: [v1, v2, v3, ...]
+        :return: anomaly score
+        """
+        record = torch.from_numpy(np.array([record], dtype="float32"))
         x_pred = self.predict(record)
-        distance = np.mean(np.power(record - x_pred, 2), axis=1)
+        distance = np.sum(np.power(record.detach().numpy() - x_pred.detach().numpy(), 2))
         # may consider using mae distance
-        # distance = np.mean(np.abs(record - x_pred), axis=1)
-        return distance
+        # distance = np.sum(np.abs(record.detach().numpy() - x_pred.detach().numpy()))
+        return abs((distance - self.avg_distance) / self.std_distance)
 
     def visualize(self, x_new, x_pred, y_label):
         colors = ['dodgerblue', 'coral']
