@@ -1,5 +1,5 @@
 import sys
-import os 
+import os
 project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_path)
 
@@ -28,7 +28,7 @@ class IforestAnomalyDetecor(BaseDetector):
             behaviour='old',
             random_state=None,
             verbose=0,
-            *args, 
+            *args,
             **kwargs
             ):
 
@@ -36,12 +36,12 @@ class IforestAnomalyDetecor(BaseDetector):
         self.n_estimators = n_estimators
         self.max_samples = max_samples
         self.contamination = contamination
-        self.max_features = max_features 
+        self.max_features = max_features
         self.bootstrap = bootstrap
         self.n_jobs = n_jobs
-        self.behaviour = behaviour 
+        self.behaviour = behaviour
         self.random_state = random_state
-        self.verbose = verbose 
+        self.verbose = verbose
         # Create iforest instance
 
         self.iforest = IsolationForest(n_estimators=self.n_estimators,
@@ -57,14 +57,18 @@ class IforestAnomalyDetecor(BaseDetector):
     def train(self, training_data):
         self.iforest.fit(X=training_data, y=None, sample_weight=None)
         return
-    
+
+    @BaseDetector.require_initialize
+    def predict(self, X):
+        return self.iforest.predict(X)
+
     @BaseDetector.require_initialize
     def handle_record(self, record):
         return self.iforest.decision_function(X=record)
 
 
 if __name__ == '__main__':
-    X = np.random.rand(100, 2) 
+    X = np.random.rand(100, 2)
     print(X)
     iforest_detector = IforestAnomalyDetecor()
     iforest_detector.initialize()
