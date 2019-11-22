@@ -54,8 +54,8 @@ class IforestAnomalyDetecor(BaseDetector):
                                              random_state=self.random_state,
                                              verbose=self.verbose)
     @BaseDetector.require_initialize
-    def train(self, training_data):
-        self.iforest.fit(X=training_data, y=None, sample_weight=None)
+    def train(self, training_X, training_Y):
+        self.iforest.fit(X=training_X, y=training_Y, sample_weight=None)
         return
     
     @BaseDetector.require_initialize
@@ -63,11 +63,11 @@ class IforestAnomalyDetecor(BaseDetector):
         return self.iforest.decision_function(X=record)
 
 
-if __name__ == '__main__':
-    X = np.random.rand(100, 2) 
-    print(X)
-    iforest_detector = IforestAnomalyDetecor()
-    iforest_detector.initialize()
-    iforest_detector.train(X)
-    res = iforest_detector.handle_record(X)
-    print (res)
+# if __name__ == '__main__'
+#     X = np.random.rand(100, 2)
+#     print(X)
+#     iforest_detector = IforestAnomalyDetecor()
+#     iforest_detector.initialize()
+#     iforest_detector.train(X)
+#     res = iforest_detector.handle_record(X)
+#     print (res)
