@@ -40,7 +40,7 @@ def ttest_detector():
 
 def ttest_credit_card_data():
     detector = AutoEncoderDetectorForest()
-    detector.initialize(29, 8)
+    detector.initialize(29, 6)
     windowed_data = []
     data = []
     with open(project_path + "/../data/SofaSofa_Anomaly.csv") as f:
