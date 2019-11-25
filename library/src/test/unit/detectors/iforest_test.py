@@ -5,13 +5,9 @@ from __future__ import print_function
 
 
 
-
-import datetime
-
 import sys
 import os
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from scipy.io import loadmat
 from pyod.utils.utility import standardizer
@@ -24,7 +20,7 @@ from detectors.iforest.iforest_detector import IforestAnomalyDetecor
 # define the number of iterations
 n_ite = 10
 
-data_file = '{0}/data/cardio'.format(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+data_file = '{0}/data/wbc'.format(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 mat = loadmat(data_file)
 
 X = mat['X']
@@ -54,20 +50,23 @@ def test_detector():
 
 
 def test_train():
-    print("Testing Train")
+    # print("Testing Train")
     detector = IforestAnomalyDetecor()
     detector.initialize()
     result = detector.train(X_train_norm, y_train)
 
 
 def test_handle_record():
-    print("Testing Handle Record")
-    print("Testing Train")
+    # print("Testing Handle Record")
+    # print("Testing Train")
     detector = IforestAnomalyDetecor()
     detector.initialize()
     detector.train(X_train_norm, y_train)
     result = detector.handle_record(X_test)
-    print(result)
+    # print(result)
+    # print("\n\n\nActual anomalies")
+    for x,y in zip(result,y_test):
+        print(x,y)
 
 
 
