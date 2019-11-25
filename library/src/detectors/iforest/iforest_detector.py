@@ -25,7 +25,7 @@ class IforestAnomalyDetecor(BaseDetector):
             max_features=1.,
             bootstrap=False,
             n_jobs=1,
-            behaviour='old',
+            behaviour='new',
             random_state=None,
             verbose=0,
             *args, 
