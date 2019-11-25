@@ -1,9 +1,7 @@
-# Created by Yash Shahani on 11/18/2019, 2:03 PM
+# Created by Yash Shahani on 11/19/2019, 6:00 PM
 
 from __future__ import division
 from __future__ import print_function
-
-
 
 import sys
 import os
@@ -48,26 +46,21 @@ def test_detector():
             random_state=None,
             verbose=0)
 
-
 def test_train():
-    # print("Testing Train")
+    print("Testing Train")
     detector = IforestAnomalyDetecor()
     detector.initialize()
     result = detector.train(X_train_norm, y_train)
-
+    print result
 
 def test_handle_record():
-    # print("Testing Handle Record")
-    # print("Testing Train")
+    print("Testing Handle Record")
     detector = IforestAnomalyDetecor()
     detector.initialize()
     detector.train(X_train_norm, y_train)
     result = detector.handle_record(X_test)
-    # print(result)
-    # print("\n\n\nActual anomalies")
     for x,y in zip(result,y_test):
         print(x,y)
-
 
 
 if __name__ == "__main__":
