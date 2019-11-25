@@ -1,5 +1,4 @@
 import sys
-import random
 import torch
 import torch.optim as optim
 import os
@@ -12,6 +11,7 @@ project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_
 sys.path.append(project_path)
 from detectors.base import BaseDetector
 from detectors.autoencoder.model import AutoEncoder
+from common.k_mean_cluster import KMeanTools
 
 
 class AutoEncoderDetector(BaseDetector):
@@ -40,8 +40,6 @@ class AutoEncoderDetector(BaseDetector):
     def train(self, x_train, num_epochs=300, verbose=False, learning_rate=1e-3):
         if self.use_gpu:
             x_train = x_train.cuda()
-
-        print("--------training--------")
 
         loss_list = []
 
@@ -73,7 +71,6 @@ class AutoEncoderDetector(BaseDetector):
 
     @BaseDetector.require_initialize
     def predict(self, x_test):
-        print("--------prediction--------")
         if self.use_gpu:
             x_new = x_test.cuda()
         else:
@@ -128,6 +125,50 @@ class AutoEncoderDetector(BaseDetector):
         plt.xlabel('Index')
         plt.ylabel('MAE')
         plt.show()
+
+
+class AutoEncoderDetectorForest(BaseDetector):
+    def __init__(self):
+        super(
+            AutoEncoderDetectorForest,
+            self).__init__(
+            timestamp_col_name=None,
+            measure_col_names=None,
+            symbolic=False)
+
+    def initialize(self, num_attributes, cluster_num, use_gpu=True):
+        super(AutoEncoderDetectorForest, self).initialize()
+
+        self.cluster_num = cluster_num
+        self.autoEncoders = []
+        self.clusters = []
+        for i in range(cluster_num):
+            self.autoEncoders.append(AutoEncoderDetector())
+            self.autoEncoders[-1].initialize(num_attributes=num_attributes, use_gpu=use_gpu)
+
+    @BaseDetector.require_initialize
+    def train(self, x_train, num_epochs=300, verbose=False, learning_rate=1e-3):
+        self.kmean = KMeanTools(x_train.numpy(), self.cluster_num)
+        result = []
+        training_data = self.kmean.get_clustered_data()
+        for i, data_cluster in enumerate(training_data):
+            result.append(self.autoEncoders[i].train(torch.from_numpy(np.array(data_cluster, dtype="float32")),
+                                                     num_epochs, verbose, learning_rate))
+        return result
+
+    @BaseDetector.require_initialize
+    def predict(self, x_test):
+        encoder = self.autoEncoders[self.kmean.predict(x_test.numpy())]
+        return encoder.predict(x_test)
+
+    @BaseDetector.require_initialize
+    def handle_record(self, record):
+        """
+        :param record: [v1, v2, v3, ...]
+        :return: anomaly score
+        """
+        encoder = self.autoEncoders[self.kmean.predict(record)]
+        return encoder.handle_record(record)
 
 
 class TestAutoEncoderDetector(unittest.TestCase):
