@@ -12,10 +12,14 @@ from common.dataset import SynthDataset, CSVDataset
 from autoencoder_detector import AutoEncoderDetector
 
 def _get_file_list():
-    if os.path.isdir(args.file):
-        file_list = glob.glob(args.file_prefix + "*")
+    if args.absolute_path:
+        filename = args.file
     else:
-        file_list = [args.file,]
+        filename = os.path.join(sys.path[0], args.file)
+    if os.path.isdir(filename):
+        file_list = glob.glob(filename + "*")
+    else:
+        file_list = [filename,]
     return file_list
 
 def _organize_data(dataset):
@@ -62,7 +66,8 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and Test anomaly detection algorithm")
     parser.add_argument('-d', "--dataset", type=str, default='credit')
-    parser.add_argument('-f', "--file", type=str, default='', help="absolute path to file or directory")
+    parser.add_argument('-a', "--absolute_path", action='store_true', help='Use absolute path')
+    parser.add_argument('-f', "--file", type=str, default='', help="path to file or directory")
     parser.add_argument('-t', "--test_size", help="test data percentage", default=0.4)
     parser.add_argument('-v', "--verbose", help="use to print loss", action='store_true')
     parser.add_argument("--epochs", type=int, default=300)
