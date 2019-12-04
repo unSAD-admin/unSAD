@@ -40,7 +40,7 @@ def ttest_detector():
 
 def ttest_credit_card_data():
     detector = AutoEncoderDetectorForest()
-    detector.initialize(29, 6)
+    detector.initialize(29, 15)
     windowed_data = []
     data = []
     with open(project_path + "/../data/SofaSofa_Anomaly.csv") as f:
@@ -66,13 +66,14 @@ def ttest_credit_card_data():
     data.sort()
     windowed_data = normal + abnomal
 
-    training_data = random.choices(normal, k=int(len(normal) * 0.55))
+    training_data = random.choices(normal, k=int(len(normal) * 0.75))
 
     training_data = torch.from_numpy(np.array(training_data, dtype="float32"))
 
-    loss_list = detector.train(training_data, num_epochs=18000, verbose=True)
+    loss_list = detector.train(training_data, num_epochs=18000, verbose=False)
 
     result = detector.handle_record_sequence(normal + abnomal)
+
 
     plots = len(loss_list) + 2
     for i in range(1, plots - 1):
@@ -148,5 +149,5 @@ def ttest_detector_on_file():
 
 if __name__ == '__main__':
     # ttest_detector()
-    #ttest_detector_on_file()
-    ttest_credit_card_data()
+    ttest_detector_on_file()
+    # ttest_credit_card_data()
