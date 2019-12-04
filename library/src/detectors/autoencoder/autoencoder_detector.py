@@ -136,7 +136,7 @@ class AutoEncoderDetectorForest(BaseDetector):
             measure_col_names=None,
             symbolic=False)
 
-    def initialize(self, num_attributes, cluster_num, use_gpu=True):
+    def initialize(self, num_attributes, cluster_num=8, use_gpu=True):
         super(AutoEncoderDetectorForest, self).initialize()
 
         self.cluster_num = cluster_num
