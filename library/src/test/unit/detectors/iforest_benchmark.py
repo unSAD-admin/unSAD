@@ -1,29 +1,12 @@
 # Created by Yash Shahani on 11/18/2019, 2:03 PM
+# Made for easy addition of more algorithms, just follow commented directions at HERE comments
+# Prerequisite: Install pyod
 
 from __future__ import division
 from __future__ import print_function
-
-
-
-
-import datetime
-
-import sys
-
-import os
-
-
-project_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.append(project_path)
-
-from detectors.iforest.iforest_detector import IforestAnomalyDetecor
-
-
-
-
-
-
 from time import time
+import sys
+import os
 
 # temporary solution for relative imports in case pyod is not installed
 # if pyod is installed, no need to use the following line
@@ -39,13 +22,12 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from scipy.io import loadmat
 
+# HERE: Import the other models you want to test
 from pyod.models.iforest import IForest
 
 from pyod.utils.utility import standardizer
 from pyod.utils.utility import precision_n_scores
 from sklearn.metrics import roc_auc_score
-
-# TODO: add neural networks, LOCI, SOS, COF, SOD
 
 # Define data file and read X and y
 mat_file_list = ['arrhythmia.mat',
@@ -67,9 +49,11 @@ mat_file_list = ['arrhythmia.mat',
                  'wbc.mat']
 
 # define the number of iterations
+# HERE: Change n_classifiers to the number of classifiers you want to benchmark
 n_ite = 10
 n_classifiers = 1
 
+# HERE: Add additional classifiers as parameters in df_columns
 df_columns = ['Data', '#Samples', '#Dimensions', 'Outlier Perc',
               'IForest']
 
@@ -81,7 +65,7 @@ time_df = pd.DataFrame(columns=df_columns)
 for j in range(len(mat_file_list)):
 
     mat_file = mat_file_list[j]
-    data_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) +'/data/'+mat_file
+    data_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data/' + mat_file
 
     mat = loadmat(data_file)
 
@@ -90,7 +74,7 @@ for j in range(len(mat_file_list)):
     outliers_fraction = np.count_nonzero(y) / len(y)
     outliers_percentage = round(outliers_fraction * 100, ndigits=4)
 
-    # construct containers for saving results
+    # Construct containers for saving results
     roc_list = [mat_file[:-4], X.shape[0], X.shape[1], outliers_percentage]
     prn_list = [mat_file[:-4], X.shape[0], X.shape[1], outliers_percentage]
     time_list = [mat_file[:-4], X.shape[0], X.shape[1], outliers_percentage]
@@ -107,13 +91,15 @@ for j in range(len(mat_file_list)):
         X_train, X_test, y_train, y_test = \
             train_test_split(X, y, test_size=0.4, random_state=random_state)
 
-        # standardizing data for processing
+        # Standardizing data for processing
         X_train_norm, X_test_norm = standardizer(X_train, X_test)
 
+        # HERE: Add the other classifiers after Isolation Forest, seperated by commas
         classifiers = {
             'Isolation Forest': IForest(contamination=outliers_fraction,
                                         random_state=random_state),
         }
+        # HERE: Give indices to these additional classifiers
         classifiers_indices = {
             'Isolation Forest': 0,
         }

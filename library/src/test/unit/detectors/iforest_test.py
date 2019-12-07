@@ -51,7 +51,7 @@ def test_train():
     detector = IforestAnomalyDetecor()
     detector.initialize()
     result = detector.train(X_train_norm, y_train)
-    print result
+    print(result)
 
 def test_handle_record():
     print("Testing Handle Record")
