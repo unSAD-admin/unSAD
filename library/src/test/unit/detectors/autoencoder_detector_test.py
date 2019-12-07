@@ -55,7 +55,6 @@ def ttest_credit_card_data():
                     buffer.append(float(value))
                 windowed_data.append(buffer)
 
-        # randomly choice 15% of data to train
     normal = []
     abnomal = []
     for i, value in enumerate(data):

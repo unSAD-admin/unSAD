@@ -55,7 +55,6 @@ def ttest_credit_card_data():
                     buffer.append(float(value))
                 windowed_data.append(buffer)
 
-        # randomly choice 15% of data to train
     normal = []
     abnomal = []
     for i, value in enumerate(data):
@@ -73,7 +72,6 @@ def ttest_credit_card_data():
     loss_list = detector.train(training_data, num_epochs=18000, verbose=False)
 
     result = detector.handle_record_sequence(normal + abnomal)
-
 
     plots = len(loss_list) + 2
     for i in range(1, plots - 1):
