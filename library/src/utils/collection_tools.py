@@ -26,6 +26,13 @@ def normalize(collection):
     return result
 
 
+def windowed_list(array, window_size):
+    result = []
+    for i in range(0, len(array) - window_size):
+        result.append(array[i: i + window_size])
+    return result
+
+
 def simple_filter(array, filter_func, window_size):
     """
     apply 1D convolution operation on array using filter_func as the

@@ -15,6 +15,7 @@ class BaseDetector:
     Base class for all anomaly detectors. When inheriting from this class please
     take note of which methods MUST be overridden, as documented below.
     """
+
     def __init__(self, timestamp_col_name=None, measure_col_names=None, symbolic=False):
         """
         Detector independent initialization, initialize resource that is
@@ -90,7 +91,7 @@ class BaseDetector:
                         len(data)) + " does not match with this detectors:" + str(len(self.measure) + 1))
                     raise UnSADException.input_number_exception()
             else:
-                if len(data) == len(self.measure):
+                if self.measure is None or len(data) == len(self.measure):
                     result = data
                 else:
                     logging.error("The number of input parameters:" + str(
